@@ -1,0 +1,6 @@
+{
+  "name": "Pension Compliance Intelligence System",
+  "description": "AI-assisted pension contribution compliance monitoring, anomaly detection, and investigation case management decision-support prototype for Mulungushi University.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
