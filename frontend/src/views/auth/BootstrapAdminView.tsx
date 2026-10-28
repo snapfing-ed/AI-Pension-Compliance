@@ -16,7 +16,7 @@ export const BootstrapAdminView: React.FC<BootstrapAdminViewProps> = ({ onNaviga
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [bootstrapKey, setBootstrapKey] = useState('MULUNGUSHI-CS-2026-ADMIN-SETUP');
+  const [bootstrapKey, setBootstrapKey] = useState('MULUNGUSHI-2026-ADMIN-SETUP');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

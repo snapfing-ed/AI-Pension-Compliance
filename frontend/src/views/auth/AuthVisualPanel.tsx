@@ -43,13 +43,12 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login'
         {/* Brand Lockup */}
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#00A99D] to-[#0a665f] text-white font-bold text-lg flex items-center justify-center shadow-lg shadow-teal-950/40 ring-1 ring-teal-300/30 shrink-0">
-            PC
+            SF
           </div>
           <div>
             <div className="text-[11px] uppercase tracking-wider font-semibold text-[#00A99D]">
-              Pension Intelligence
+              SnapFing
             </div>
-            <div className="text-xs text-slate-300">Mulungushi University Capstone</div>
           </div>
         </div>
 
@@ -58,9 +57,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login'
           <h1 className="text-2xl sm:text-3xl xl:text-4xl font-bold tracking-tight text-white max-w-xl text-balance">
             Pension Compliance Intelligence System
           </h1>
-          <p className="text-sm sm:text-base font-semibold text-[#00A99D] mt-2 tracking-wide">
-            Intelligent Monitoring. Informed Decisions. Stronger Compliance.
-          </p>
+          
           <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed max-w-lg mt-3 font-normal">
             Bringing pension contribution records, compliance analysis, and investigation workflows together in one intelligent decision-support platform.
           </p>
@@ -121,12 +118,10 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login'
           <span className="font-semibold text-slate-200">
             Academic Capstone Prototype | Mulungushi University
           </span>
-          <span className="text-[11px] font-mono text-teal-300/80">
-            ZMW Financial Audit Mode
-          </span>
+         
         </div>
         <p className="text-[11px] text-slate-400">
-          Designed for authorised pension compliance officers and system administrators.
+          AI-Based Pension Contribution Compliance Monitoring System
         </p>
       </div>
     </div>

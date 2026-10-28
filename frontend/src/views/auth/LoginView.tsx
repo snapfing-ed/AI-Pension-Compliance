@@ -51,7 +51,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onNavigateToRegister, onNa
           <div className="space-y-1.5">
             <div className="lg:hidden inline-flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-[#00A99D] text-white font-bold text-sm flex items-center justify-center">
-                PC
+                SF
               </div>
               <span className="font-semibold text-xs tracking-tight text-slate-700 dark:text-slate-300">
                 Pension Compliance
@@ -59,7 +59,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onNavigateToRegister, onNa
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Welcome back
+              Welcome Back
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400">
               Enter your institutional email and password to access the compliance workspace.
