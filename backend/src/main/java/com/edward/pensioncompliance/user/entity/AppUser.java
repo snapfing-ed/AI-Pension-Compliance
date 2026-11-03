@@ -53,7 +53,7 @@ public class AppUser {
     @Column(name = "last_login_at")
     private OffsetDateTime lastLoginAt;
 
-    protected AppUser() {
+    public AppUser() {
         // Required by JPA
     }
 
@@ -114,6 +114,16 @@ public class AppUser {
         failedLoginAttempts = 0;
         lockedUntil = null;
         lastLoginAt = now;
+    }
+
+    public void requirePasswordChange() { this.mustChangePassword = true; }
+
+    public void changePassword(String passwordHash, OffsetDateTime now) {
+        this.passwordHash = passwordHash;
+        this.mustChangePassword = false;
+        this.passwordChangedAt = now;
+        this.failedLoginAttempts = 0;
+        this.lockedUntil = null;
     }
 
     // Getters and setters

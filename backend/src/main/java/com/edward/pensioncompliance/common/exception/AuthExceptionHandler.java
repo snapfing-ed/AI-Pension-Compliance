@@ -45,7 +45,7 @@ public class AuthExceptionHandler {
                         "timestamp", Instant.now().toString(),
                         "status", 400,
                         "error", "Bad Request",
-                        "message", "Please provide valid login details.",
+                        "message", "Please check the submitted fields.",
                         "path", request.getRequestURI()
                 )
         );

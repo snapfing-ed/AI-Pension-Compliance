@@ -1,8 +1,10 @@
+
 package com.edward.pensioncompliance.auth.service;
 
 import com.edward.pensioncompliance.audit.service.AuditService;
 import com.edward.pensioncompliance.auth.dto.AuthResponse;
 import com.edward.pensioncompliance.auth.dto.LoginRequest;
+import com.edward.pensioncompliance.user.entity.AccountStatus;
 import com.edward.pensioncompliance.user.entity.AppUser;
 import com.edward.pensioncompliance.user.entity.UserRole;
 import com.edward.pensioncompliance.user.repository.AppUserRepository;
@@ -19,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
 
 import org.springframework.stereotype.Service;
@@ -35,6 +38,9 @@ public class AuthService {
     private final UserRoleRepository userRoleRepository;
     private final AuditService auditService;
     private final SecurityContextRepository securityContextRepository;
+
+    private final SecurityContextLogoutHandler logoutHandler =
+            new SecurityContextLogoutHandler();
 
     public AuthService(
             AuthenticationManager authenticationManager,
@@ -58,6 +64,9 @@ public class AuthService {
     ) {
 
         String identifier = loginRequest.identifier().trim();
+        if (identifier.contains("@")) {
+            identifier = identifier.toLowerCase(java.util.Locale.ROOT);
+        }
 
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
@@ -88,9 +97,7 @@ public class AuthService {
             // Only active accounts accumulate failed password attempts.
             if (appUser != null) {
 
-                if (appUser.getAccountStatus()
-                        == com.edward.pensioncompliance.user.entity.AccountStatus.ACTIVE) {
-
+                if (appUser.getAccountStatus() == AccountStatus.ACTIVE) {
                     appUser.recordFailedLoginAttempt(now);
                 }
 
@@ -170,6 +177,69 @@ public class AuthService {
                 appUser.getInstitutionalEmail(),
                 assignment.getRole().getRoleCode(),
                 appUser.isMustChangePassword()
+        );
+    }
+
+    /**
+     * Returns the currently authenticated user's information.
+     */
+    @Transactional(readOnly = true)
+    public AuthResponse getCurrentUser(Authentication authentication) {
+
+        AppUser appUser = appUserRepository
+                .findByUsername(authentication.getName())
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Authenticated user account was not found."
+                        )
+                );
+
+        UserRole assignment = userRoleRepository
+                .findByUser_UserId(appUser.getUserId())
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Authenticated user has no assigned role."
+                        )
+                );
+
+        return new AuthResponse(
+                appUser.getUserId(),
+                appUser.getUsername(),
+                appUser.getDisplayName(),
+                appUser.getInstitutionalEmail(),
+                assignment.getRole().getRoleCode(),
+                appUser.isMustChangePassword()
+        );
+    }
+
+    /**
+     * Records logout and invalidates the server-side session.
+     */
+    @Transactional
+    public void logout(
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+
+        AppUser appUser = appUserRepository
+                .findByUsername(authentication.getName())
+                .orElse(null);
+
+        if (appUser != null) {
+            auditService.record(
+                    appUser,
+                    "AUTH_LOGOUT",
+                    "APP_USER",
+                    String.valueOf(appUser.getUserId()),
+                    "User logged out successfully."
+            );
+        }
+
+        logoutHandler.logout(
+                request,
+                response,
+                authentication
         );
     }
 }

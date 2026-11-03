@@ -1,3 +1,4 @@
+
 package com.edward.pensioncompliance.auth.controller;
 
 import com.edward.pensioncompliance.auth.dto.AuthResponse;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,29 +26,22 @@ public class AuthController {
         this.authService = authService;
     }
 
-    /**
-     * Provides a CSRF token for the frontend.
-     * The frontend must send it in the X-CSRF-TOKEN header
-     * when making POST, PUT, PATCH or DELETE requests.
-     */
     @GetMapping("/csrf")
     public ResponseEntity<Map<String, String>> csrf(CsrfToken csrfToken) {
-
         return ResponseEntity.ok(
-                Map.of("token", csrfToken.getToken())
+                Map.of(
+                        "token", csrfToken.getToken(),
+                        "headerName", csrfToken.getHeaderName()
+                )
         );
     }
 
-    /**
-     * Authenticates a user and establishes a server-side session.
-     */
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-
         AuthResponse authResponse = authService.login(
                 loginRequest,
                 request,
@@ -54,5 +49,29 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(authResponse);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AuthResponse> currentUser(
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(
+                authService.getCurrentUser(authentication)
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            Authentication authentication,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        authService.logout(
+                authentication,
+                request,
+                response
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }

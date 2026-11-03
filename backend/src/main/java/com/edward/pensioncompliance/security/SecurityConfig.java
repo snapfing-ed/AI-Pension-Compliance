@@ -1,5 +1,7 @@
+
 package com.edward.pensioncompliance.security;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 @Configuration
 @EnableMethodSecurity
@@ -46,10 +49,29 @@ public class SecurityConfig {
         return new HttpSessionSecurityContextRepository();
     }
 
+    /**
+     * Prevents the filter from being registered twice.
+     * It will be managed by the Spring Security filter chain.
+     */
+    @Bean
+    public FilterRegistrationBean<ActiveAccountSessionFilter>
+    activeAccountFilterRegistration(
+            ActiveAccountSessionFilter filter
+    ) {
+
+        FilterRegistrationBean<ActiveAccountSessionFilter> registration =
+                new FilterRegistrationBean<>(filter);
+
+        registration.setEnabled(false);
+
+        return registration;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            SecurityContextRepository securityContextRepository
+            SecurityContextRepository securityContextRepository,
+            ActiveAccountSessionFilter activeAccountSessionFilter
     ) throws Exception {
 
         http
@@ -58,6 +80,7 @@ public class SecurityConfig {
             )
 
             .authorizeHttpRequests(auth -> auth
+
                 .requestMatchers("/actuator/health").permitAll()
 
                 .requestMatchers(
@@ -79,9 +102,14 @@ public class SecurityConfig {
             )
 
             .formLogin(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable);
+            .httpBasic(AbstractHttpConfigurer::disable)
 
-        // CSRF is intentionally not disabled.
+            .addFilterAfter(
+                activeAccountSessionFilter,
+                SecurityContextHolderFilter.class
+            );
+
+        // CSRF protection remains enabled.
 
         return http.build();
     }

@@ -1,8 +1,10 @@
+
 package com.edward.pensioncompliance.user.entity;
 
 import com.edward.pensioncompliance.role.entity.AppRole;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(
@@ -35,6 +37,15 @@ public class UserRole {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_by_user_id")
     private AppUser assignedBy;
+
+    // Constructor for assigning an existing role to a user
+    public UserRole(AppUser user, AppRole role, AppUser assignedBy) {
+        this.id = new UserRoleId(user.getUserId(), role.getRoleId());
+        this.user = user;
+        this.role = role;
+        this.assignedAt = OffsetDateTime.now(ZoneOffset.UTC);
+        this.assignedBy = assignedBy;
+    }
 
     protected UserRole() {
         // Required by JPA
