@@ -1,12 +1,12 @@
+
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AppProvider, useApp } from './context/AppContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { LoginView } from './views/auth/LoginView';
-import { RegisterView } from './views/auth/RegisterView';
-import { BootstrapAdminView } from './views/auth/BootstrapAdminView';
 import { AccessDeniedView } from './components/auth/AccessDeniedView';
+import { FirstLoginPasswordView } from './views/auth/FirstLoginPasswordView';
 
 import { AdminOverviewDashboard } from './views/AdminOverviewDashboard';
 import { OverviewDashboard } from './views/OverviewDashboard';
@@ -23,9 +23,7 @@ import { ModelEvaluationView } from './views/ModelEvaluationView';
 import { UserManagementView } from './views/UserManagementView';
 import { AuditLogsView } from './views/AuditLogsView';
 import { SystemSettingsView } from './views/SystemSettingsView';
-import { BookOpen, X, KeyRound, Shield, Lock } from 'lucide-react';
-
-type AuthScreenState = 'LOGIN' | 'REGISTER' | 'BOOTSTRAP';
+import { BookOpen, X, Shield } from 'lucide-react';
 
 const AuthenticatedApp: React.FC = () => {
   const { activeTab, hasPermission } = useApp();
@@ -33,11 +31,16 @@ const AuthenticatedApp: React.FC = () => {
   const [showGuideModal, setShowGuideModal] = useState(false);
 
   const renderActiveView = () => {
-    // Route Guard: Deny access if current user's role lacks permission for the activeTab
     if (!hasPermission(activeTab)) {
       return (
         <AccessDeniedView
-          requiredRole={activeTab === 'users' || activeTab === 'settings' || activeTab === 'admin-overview' ? 'SYSTEM_ADMINISTRATOR' : 'COMPLIANCE_MONITOR'}
+          requiredRole={
+            activeTab === 'users' ||
+            activeTab === 'settings' ||
+            activeTab === 'admin-overview'
+              ? 'SYSTEM_ADMINISTRATOR'
+              : 'COMPLIANCE_MONITOR'
+          }
           attemptedResource={activeTab}
         />
       );
@@ -75,16 +78,21 @@ const AuthenticatedApp: React.FC = () => {
       case 'settings':
         return <SystemSettingsView />;
       default:
-        return currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? <AdminOverviewDashboard /> : <OverviewDashboard />;
+        return currentUser?.role === 'SYSTEM_ADMINISTRATOR'
+          ? <AdminOverviewDashboard />
+          : <OverviewDashboard />;
     }
   };
 
   return (
     <div className="flex min-h-screen bg-slate-100 text-slate-900 font-sans">
       <Sidebar />
+
       <div className="flex-1 flex flex-col min-w-0">
         <Header />
-        <main className="flex-1 overflow-y-auto">{renderActiveView()}</main>
+        <main className="flex-1 overflow-y-auto">
+          {renderActiveView()}
+        </main>
 
         {/* Global Floating Research Guide Button */}
         <div className="fixed bottom-4 right-4 z-40 no-print">
@@ -107,12 +115,14 @@ const AuthenticatedApp: React.FC = () => {
                     Mulungushi University BSc CS Capstone RBAC Guide
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Authentication, IndexedDB Persistence, and Two-Role Separation of Responsibilities
+                    Authentication, Server-Managed Sessions, and Role-Based Access Control
                   </p>
                 </div>
+
                 <button
                   onClick={() => setShowGuideModal(false)}
                   className="p-1 rounded hover:bg-slate-100 text-slate-500"
+                  aria-label="Close guide"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -124,6 +134,7 @@ const AuthenticatedApp: React.FC = () => {
                     <Shield className="w-4 h-4 text-purple-700" />
                     <span>Active Authenticated Session:</span>
                   </div>
+
                   <div className="text-[11px]">
                     User: <strong>{currentUser?.name}</strong> ({currentUser?.email}) · Role:{' '}
                     <strong className="font-mono">{currentUser?.role}</strong> · Status:{' '}
@@ -132,39 +143,54 @@ const AuthenticatedApp: React.FC = () => {
                 </div>
 
                 <div>
-                  <div className="font-bold text-slate-900 mb-1">Strict Two-Role Separation Enforced:</div>
+                  <div className="font-bold text-slate-900 mb-1">
+                    Role-Based Separation of Responsibilities:
+                  </div>
+
                   <div className="grid grid-cols-2 gap-2 text-[11px]">
                     <div className="p-2.5 rounded bg-slate-50 border border-slate-200">
-                      <div className="font-bold text-purple-900 mb-0.5">ROLE 1: SYSTEM ADMINISTRATOR</div>
+                      <div className="font-bold text-purple-900 mb-0.5">
+                        SYSTEM ADMINISTRATOR
+                      </div>
                       <p className="text-slate-600">
-                        Oversees user accounts, role allocation, activation/suspension, security audit logs, system
-                        thresholds, and read-only compliance oversight.
+                        Oversees user accounts, role allocation, activation and suspension,
+                        security audit logs, system thresholds, and compliance oversight.
                       </p>
                     </div>
 
                     <div className="p-2.5 rounded bg-slate-50 border border-slate-200">
-                      <div className="font-bold text-teal-900 mb-0.5">ROLE 2: COMPLIANCE MONITOR / SUPERVISOR</div>
+                      <div className="font-bold text-teal-900 mb-0.5">
+                        COMPLIANCE PERSONNEL
+                      </div>
                       <p className="text-slate-600">
-                        Executes deterministic compliance rules, evaluates AI anomalies, manages investigation cases and
-                        evidence notes, and generates compliance reports.
+                        Reviews contribution compliance, evaluates AI anomalies, manages
+                        investigation cases and evidence notes, and generates reports.
                       </p>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <div className="font-bold text-slate-900 mb-1">Persistence & Cryptographic Verification:</div>
+                  <div className="font-bold text-slate-900 mb-1">
+                    Authentication and Security:
+                  </div>
+
                   <ul className="list-disc list-inside space-y-1 text-[11px] text-slate-600">
                     <li>
-                      <strong>IndexedDB Storage:</strong> Accounts persist across page refreshes in the browser database.
+                      <strong>Server-managed sessions:</strong> Authentication is managed
+                      by the Spring Boot backend.
                     </li>
                     <li>
-                      <strong>Cryptographic Hashing:</strong> Passwords are verified via SHA-256 with unique 16-byte
-                      salts. Plaintext passwords are never stored.
+                      <strong>Password protection:</strong> Password verification is
+                      performed by the backend using its configured password encoder.
                     </li>
                     <li>
-                      <strong>Route & Action Guards:</strong> Direct URL or navigation tampering results in an immediate
-                      Access Denied response and security audit event.
+                      <strong>Access control:</strong> Authenticated users receive
+                      permissions according to their assigned roles.
+                    </li>
+                    <li>
+                      <strong>Audit records:</strong> Authentication and relevant security
+                      operations are recorded by the backend.
                     </li>
                   </ul>
                 </div>
@@ -187,37 +213,31 @@ const AuthenticatedApp: React.FC = () => {
 };
 
 const RootRouter: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const [authScreen, setAuthScreen] = useState<AuthScreenState>('LOGIN');
+  const { isAuthenticated, isLoading, currentUser } = useAuth();
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white space-y-3">
         <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white font-bold text-xl animate-pulse">
-          PC
+          SC
         </div>
+
         <div className="text-sm font-semibold tracking-wide">
-          Initializing Pension Compliance Intelligence Gateway...
+          Initialising SmartCompliance...
         </div>
-        <div className="text-xs text-slate-400">Verifying secure IndexedDB repository</div>
+
+        <div className="text-xs text-slate-400">
+          Verifying your authentication session
+        </div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    if (authScreen === 'REGISTER') {
-      return <RegisterView onNavigateToLogin={() => setAuthScreen('LOGIN')} />;
-    }
-    if (authScreen === 'BOOTSTRAP') {
-      return <BootstrapAdminView onNavigateToLogin={() => setAuthScreen('LOGIN')} />;
-    }
-    return (
-      <LoginView
-        onNavigateToRegister={() => setAuthScreen('REGISTER')}
-        onNavigateToBootstrap={() => setAuthScreen('BOOTSTRAP')}
-      />
-    );
+    return <LoginView />;
   }
+
+  if (currentUser?.mustChangePassword) return <FirstLoginPasswordView />;
 
   return (
     <AppProvider>
