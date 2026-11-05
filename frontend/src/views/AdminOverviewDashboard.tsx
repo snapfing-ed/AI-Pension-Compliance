@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
-import { getAllUsersFromDB } from '../services/db/indexedDB';
+import { AuthService } from '../services/authService';
 import { User } from '../types';
 import { formatZMW, formatDateTime } from '../utils/formatters';
 
@@ -24,13 +24,17 @@ export const AdminOverviewDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    getAllUsersFromDB().then(setUsers);
+    AuthService.listUsers()
+      .then(setUsers)
+      .catch(() => setUsers([]));
   }, []);
 
   const totalUsers = users.length;
   const activeUsers = users.filter((u) => u.status === 'ACTIVE').length;
   const adminCount = users.filter((u) => u.role === 'SYSTEM_ADMINISTRATOR').length;
   const monitorCount = users.filter((u) => u.role === 'COMPLIANCE_MONITOR').length;
+
+  const supervisorCount = users.filter((u) => u.role === 'COMPLIANCE_SUPERVISOR').length;
 
   const totalExpected = records.reduce((s, r) => s + r.expectedAmount, 0);
   const totalRemitted = records.reduce((s, r) => s + r.remittedAmount, 0);
@@ -76,12 +80,13 @@ export const AdminOverviewDashboard: React.FC = () => {
           </div>
         </div>
 
+
         <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <div className="text-xs font-medium text-slate-500">Local Account Storage</div>
-          <div className="text-xl font-bold text-slate-900 mt-1 font-mono">IndexedDB</div>
+          <div className="text-xs font-medium text-slate-500">Authentication Backend</div>
+          <div className="text-xl font-bold text-slate-900 mt-1 font-mono">Spring Boot</div>
           <div className="mt-2 text-[11px] text-slate-500 flex justify-between">
-            <span>SHA-256 Salted Hashes</span>
-            <span className="text-emerald-700 font-medium">Encrypted</span>
+            <span>{adminCount} Admins · {supervisorCount} Supervisors · {monitorCount} Monitors</span>
+            <span className="text-emerald-700 font-medium">Active</span>
           </div>
         </div>
 
