@@ -1,10 +1,38 @@
 import React, { useState, useMemo } from 'react';
 import { ScrollText, Search, Filter, Download, ShieldCheck, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useEffect } from 'react';
 import { formatDateTime, exportToCSV } from '../utils/formatters';
 
 export const AuditLogsView: React.FC = () => {
-  const { auditLogs } = useApp();
+  const { auditLogs: seedLogs } = useApp();
+const [backendLogs, setBackendLogs] = useState<typeof seedLogs | null>(null);
+
+useEffect(() => {
+  fetch('/api/admin/audit-events?page=0&size=50', {
+    credentials: 'include',
+    headers: { Accept: 'application/json' },
+  })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data?.content) {
+        setBackendLogs(data.content.map((e: any) => ({
+          id: String(e.auditEventId),
+          timestamp: e.eventTimestamp,
+          actor: e.actorUsername,
+          role: 'SYSTEM_ADMINISTRATOR' as const,
+          action: e.eventType,
+          resource: e.entityType,
+          changeSummary: e.actionSummary,
+          outcome: 'SUCCESS' as const,
+          referenceId: e.entityId ?? '',
+        })));
+      }
+    })
+    .catch(() => null);
+}, []);
+
+const auditLogs = backendLogs ?? seedLogs;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [actionFilter, setActionFilter] = useState('ALL');
@@ -76,7 +104,7 @@ export const AuditLogsView: React.FC = () => {
             placeholder="Search audit trail by actor, action keyword, or change summary..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white"
           />
         </div>
 
@@ -85,7 +113,7 @@ export const AuditLogsView: React.FC = () => {
           <select
             value={actorFilter}
             onChange={(e) => setActorFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Actors ({distinctActors.length})</option>
             {distinctActors.map((a) => (
@@ -101,7 +129,7 @@ export const AuditLogsView: React.FC = () => {
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Actions ({distinctActions.length})</option>
             {distinctActions.map((act) => (

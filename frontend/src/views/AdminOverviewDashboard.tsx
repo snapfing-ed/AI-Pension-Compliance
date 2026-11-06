@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
-import { getAllUsersFromDB } from '../services/db/indexedDB';
+import { AuthService } from '../services/authService';
 import { User } from '../types';
 import { formatZMW, formatDateTime } from '../utils/formatters';
 
@@ -24,13 +24,17 @@ export const AdminOverviewDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    getAllUsersFromDB().then(setUsers);
+    AuthService.listUsers()
+      .then(setUsers)
+      .catch(() => setUsers([]));
   }, []);
 
   const totalUsers = users.length;
   const activeUsers = users.filter((u) => u.status === 'ACTIVE').length;
   const adminCount = users.filter((u) => u.role === 'SYSTEM_ADMINISTRATOR').length;
   const monitorCount = users.filter((u) => u.role === 'COMPLIANCE_MONITOR').length;
+
+  const supervisorCount = users.filter((u) => u.role === 'COMPLIANCE_SUPERVISOR').length;
 
   const totalExpected = records.reduce((s, r) => s + r.expectedAmount, 0);
   const totalRemitted = records.reduce((s, r) => s + r.remittedAmount, 0);
@@ -41,9 +45,9 @@ export const AdminOverviewDashboard: React.FC = () => {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Top Banner */}
-      <div className="bg-purple-950/20 border border-purple-200 rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-purple-900">
+      <div className="bg-blue-950/20 border border-blue-200 rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs text-blue-900">
         <div className="flex items-center gap-2.5">
-          <ShieldAlert className="w-5 h-5 text-purple-700 shrink-0" />
+          <ShieldAlert className="w-5 h-5 text-blue-700 shrink-0" />
           <div>
             <span className="font-bold">System Administration Dashboard: </span>
             <span>
@@ -51,14 +55,14 @@ export const AdminOverviewDashboard: React.FC = () => {
             </span>
           </div>
         </div>
-        <div className="text-[11px] font-mono text-purple-800 shrink-0">
+        <div className="text-[11px] font-mono text-blue-800 shrink-0">
           Administrator: {currentUser?.name}
         </div>
       </div>
 
       {/* Admin KPI Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
+      <div className="flex flex-wrap divide-x divide-slate-300 border-y border-slate-200 bg-white">
+        <div className="flex-1 min-w-52 px-4 py-2">
           <div className="text-xs font-medium text-slate-500">Registered Accounts</div>
           <div className="text-xl font-bold text-slate-900 mt-1 font-mono">{totalUsers}</div>
           <div className="mt-2 text-[11px] text-slate-500 flex justify-between">
@@ -67,25 +71,26 @@ export const AdminOverviewDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
+        <div className="flex-1 min-w-52 px-4 py-2">
           <div className="text-xs font-medium text-slate-500">Security Audit Events</div>
-          <div className="text-xl font-bold text-purple-700 mt-1 font-mono">{auditLogs.length}</div>
+          <div className="text-xl font-bold text-blue-700 mt-1 font-mono">{auditLogs.length}</div>
           <div className="mt-2 text-[11px] text-slate-500 flex justify-between">
             <span>Immutable Trail</span>
-            <span className="text-teal-700 font-medium">Logged</span>
+            <span className="text-blue-700 font-medium">Logged</span>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <div className="text-xs font-medium text-slate-500">Local Account Storage</div>
-          <div className="text-xl font-bold text-slate-900 mt-1 font-mono">IndexedDB</div>
+
+        <div className="flex-1 min-w-52 px-4 py-2">
+          <div className="text-xs font-medium text-slate-500">Authentication Backend</div>
+          <div className="text-xl font-bold text-slate-900 mt-1 font-mono">Spring Boot</div>
           <div className="mt-2 text-[11px] text-slate-500 flex justify-between">
-            <span>SHA-256 Salted Hashes</span>
-            <span className="text-emerald-700 font-medium">Encrypted</span>
+            <span>{adminCount} Admins · {supervisorCount} Supervisors · {monitorCount} Monitors</span>
+            <span className="text-emerald-700 font-medium">Active</span>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
+        <div className="flex-1 min-w-52 px-4 py-2">
           <div className="text-xs font-medium text-slate-500">System Engine Status</div>
           <div className="text-xl font-bold text-emerald-700 mt-1">Operational</div>
           <div className="mt-2 text-[11px] text-slate-500 flex justify-between">
@@ -99,11 +104,11 @@ export const AdminOverviewDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div
           onClick={() => setActiveTab('users')}
-          className="bg-white border border-slate-200 hover:border-purple-300 rounded-lg p-4 cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-white border border-slate-200 hover:border-blue-300 rounded-lg p-4 cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
-            <Users className="w-5 h-5 text-purple-600" />
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
+            <Users className="w-5 h-5 text-blue-600" />
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
           </div>
           <h3 className="text-sm font-bold text-slate-900 mt-3">User & Access Management</h3>
           <p className="text-xs text-slate-500 mt-1">
@@ -113,11 +118,11 @@ export const AdminOverviewDashboard: React.FC = () => {
 
         <div
           onClick={() => setActiveTab('audit')}
-          className="bg-white border border-slate-200 hover:border-purple-300 rounded-lg p-4 cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-white border border-slate-200 hover:border-blue-300 rounded-lg p-4 cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
-            <ScrollText className="w-5 h-5 text-purple-600" />
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
+            <ScrollText className="w-5 h-5 text-blue-600" />
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
           </div>
           <h3 className="text-sm font-bold text-slate-900 mt-3">Security & Activity Audit Logs</h3>
           <p className="text-xs text-slate-500 mt-1">
@@ -127,11 +132,11 @@ export const AdminOverviewDashboard: React.FC = () => {
 
         <div
           onClick={() => setActiveTab('settings')}
-          className="bg-white border border-slate-200 hover:border-purple-300 rounded-lg p-4 cursor-pointer transition-all hover:shadow-xs group"
+          className="bg-white border border-slate-200 hover:border-blue-300 rounded-lg p-4 cursor-pointer transition-all hover:shadow-xs group"
         >
           <div className="flex items-center justify-between">
-            <Settings className="w-5 h-5 text-purple-600" />
-            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-purple-600 transition-colors" />
+            <Settings className="w-5 h-5 text-blue-600" />
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
           </div>
           <h3 className="text-sm font-bold text-slate-900 mt-3">System Settings & Thresholds</h3>
           <p className="text-xs text-slate-500 mt-1">
@@ -151,7 +156,7 @@ export const AdminOverviewDashboard: React.FC = () => {
           </div>
           <button
             onClick={() => setActiveTab('reports')}
-            className="text-xs font-semibold text-purple-700 hover:text-purple-800 flex items-center gap-1"
+            className="text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1"
           >
             <span>Audit Reports</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -167,7 +172,7 @@ export const AdminOverviewDashboard: React.FC = () => {
 
           <div className="p-3 bg-slate-50 rounded border border-slate-200">
             <div className="text-slate-500">Total Confirmed Remittances</div>
-            <div className="text-base font-bold font-mono text-teal-700 mt-1">{formatZMW(totalRemitted)}</div>
+            <div className="text-base font-bold font-mono text-blue-700 mt-1">{formatZMW(totalRemitted)}</div>
             <div className="text-[11px] text-slate-500 mt-0.5">Verified treasury receipts</div>
           </div>
 
@@ -185,7 +190,7 @@ export const AdminOverviewDashboard: React.FC = () => {
           <h3 className="text-sm font-bold text-slate-900">Recent Security & Configuration Audit Events</h3>
           <button
             onClick={() => setActiveTab('audit')}
-            className="text-xs font-semibold text-purple-700 hover:text-purple-800"
+            className="text-xs font-semibold text-blue-700 hover:text-blue-800"
           >
             View Complete Log ({auditLogs.length})
           </button>
@@ -209,7 +214,7 @@ export const AdminOverviewDashboard: React.FC = () => {
                     {formatDateTime(log.timestamp)}
                   </td>
                   <td className="py-2.5 px-3 font-semibold text-slate-900 whitespace-nowrap">{log.actor}</td>
-                  <td className="py-2.5 px-3 font-mono text-purple-700 whitespace-nowrap">{log.action}</td>
+                  <td className="py-2.5 px-3 font-mono text-blue-700 whitespace-nowrap">{log.action}</td>
                   <td className="py-2.5 px-3 text-slate-700 max-w-sm truncate">{log.changeSummary}</td>
                   <td className="py-2.5 px-3">
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800">
