@@ -1,19 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import {
-  TrendingUp,
-  AlertTriangle,
-  Clock,
-  ShieldCheck,
-  Building2,
-  Users,
-  FileCheck2,
   ArrowRight,
-  Filter,
-  CheckCircle,
-  HelpCircle,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { formatZMW, formatDate } from '../utils/formatters';
+import { formatZMW } from '../utils/formatters';
 
 export const OverviewDashboard: React.FC = () => {
   const {
@@ -24,7 +14,6 @@ export const OverviewDashboard: React.FC = () => {
     cases,
     setActiveTab,
     setActiveDetailId,
-    systemConfig,
   } = useApp();
 
   const [selectedPeriod, setSelectedPeriod] = useState<string>('ALL');
@@ -78,17 +67,6 @@ export const OverviewDashboard: React.FC = () => {
     );
   }, [cases]);
 
-  // Aggregate monthly trends for chart
-  const monthlyTrends = useMemo(() => {
-    const months = ['2026-07', '2026-08', '2026-09'];
-    return months.map((m) => {
-      const monthRecs = records.filter((r) => r.period === m);
-      const expected = monthRecs.reduce((sum, r) => sum + r.expectedAmount, 0);
-      const remitted = monthRecs.reduce((sum, r) => sum + r.remittedAmount, 0);
-      return { month: m, expected, remitted };
-    });
-  }, [records]);
-
   // Top high-priority cases
   const highPriorityCases = useMemo(() => {
     return [...cases]
@@ -113,7 +91,7 @@ export const OverviewDashboard: React.FC = () => {
           <select
             value={selectedPeriod}
             onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="bg-white border border-slate-300 text-slate-800 rounded px-2.5 py-1 text-xs font-medium focus:outline-none focus:border-teal-500"
+            className="bg-white border border-slate-300 text-slate-800 rounded px-2.5 py-1 text-xs font-medium focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Recorded Cycles</option>
             <option value="2026-09">September 2026</option>
@@ -123,185 +101,34 @@ export const OverviewDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Metric Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: Expected Obligations */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <div className="text-xs font-medium text-slate-500">Total Expected Obligations</div>
-          <div className="text-xl font-bold text-slate-900 mt-1 font-mono">{formatZMW(totalExpected)}</div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>{filteredRecords.length} Contribution Cycles</span>
-            <span>{employers.length} Employers</span>
-          </div>
+      {/* Compact ledger indicators */}
+      <div className="flex flex-wrap divide-x divide-slate-300 border-y border-slate-200 bg-white">
+        <div className="px-4 py-2 min-w-[12rem] flex-1">
+          <div className="text-[11px] font-medium text-slate-500">Expected obligations</div>
+          <div className="font-mono text-base font-semibold text-slate-900">{formatZMW(totalExpected)}</div>
+          <div className="text-[10px] text-slate-500">{filteredRecords.length} cycles · {employers.length} employers</div>
         </div>
-
-        {/* Metric 2: Recorded Remittances */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <div className="text-xs font-medium text-slate-500">Recorded Remittances Received</div>
-          <div className="text-xl font-bold text-teal-700 mt-1 font-mono">{formatZMW(totalRemitted)}</div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>
-              {totalExpected > 0 ? ((totalRemitted / totalExpected) * 100).toFixed(1) : 0}% Realised
-            </span>
-            <span className="text-teal-700 font-medium">Reconciled Ledger</span>
-          </div>
+        <div className="px-4 py-2 min-w-[12rem] flex-1">
+          <div className="text-[11px] font-medium text-slate-500">Remittances received</div>
+          <div className="font-mono text-base font-semibold text-blue-700">{formatZMW(totalRemitted)}</div>
+          <div className="text-[10px] text-slate-500">{totalExpected > 0 ? ((totalRemitted / totalExpected) * 100).toFixed(1) : 0}% realised</div>
         </div>
-
-        {/* Metric 3: Potential Discrepancy & Shortfall */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <div className="text-xs font-medium text-slate-500">Identified Contribution Shortfall</div>
-          <div className="text-xl font-bold text-amber-600 mt-1 font-mono">{formatZMW(totalShortfall)}</div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>{missingSchedulesCount} Missing · {unusualRecordsCount} Unusual</span>
-            <span className="text-amber-700 font-medium">Subject to Audit</span>
-          </div>
+        <div className="px-4 py-2 min-w-[12rem] flex-1">
+          <div className="text-[11px] font-medium text-slate-500">Contribution shortfall</div>
+          <div className="font-mono text-base font-semibold text-amber-700">{formatZMW(totalShortfall)}</div>
+          <div className="text-[10px] text-slate-500">{missingSchedulesCount} missing · {unusualRecordsCount} unusual</div>
         </div>
-
-        {/* Metric 4: Active Investigations */}
-        <div className="bg-white border border-slate-200 rounded-lg p-4">
-          <div className="text-xs font-medium text-slate-500">Open Investigation Cases</div>
-          <div className="text-xl font-bold text-slate-900 mt-1 font-mono">{openCases.length}</div>
-          <div className="mt-2 text-[11px] text-slate-500 flex items-center justify-between">
-            <span className={overdueCases.length > 0 ? 'text-rose-600 font-medium' : 'text-slate-500'}>
-              {overdueCases.length} Overdue Attention
-            </span>
-            <button
-              onClick={() => setActiveTab('cases')}
-              className="text-teal-700 hover:text-teal-800 font-medium flex items-center gap-0.5"
-            >
-              <span>View Queue</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
+        <div className="px-4 py-2 min-w-[12rem] flex-1">
+          <div className="text-[11px] font-medium text-slate-500">Open investigations</div>
+          <div className="font-mono text-base font-semibold text-slate-900">{openCases.length}</div>
+          <div className={overdueCases.length > 0 ? 'text-[10px] font-medium text-rose-700' : 'text-[10px] text-slate-500'}>{overdueCases.length} overdue</div>
         </div>
       </div>
 
-      {/* Main Charts & Analysis Split */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Trend Bar Visualization */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-lg p-5">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900">Monthly Contribution Volume (Expected vs Remitted)</h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Synthetic historical comparisons across reporting cycles in Zambian Kwacha (ZMW)
-              </p>
-            </div>
-            <div className="flex items-center gap-4 text-xs font-medium">
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 bg-slate-300 rounded-sm"></span>
-                <span className="text-slate-600">Expected</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 bg-teal-600 rounded-sm"></span>
-                <span className="text-slate-600">Remitted</span>
-              </div>
-            </div>
-          </div>
-
-          {/* SVG Bar Chart */}
-          <div className="mt-6 space-y-4">
-            {monthlyTrends.map((t) => {
-              const maxVal = 1600000;
-              const expectedPct = Math.min(100, (t.expected / maxVal) * 100);
-              const remittedPct = Math.min(100, (t.remitted / maxVal) * 100);
-              const variance = t.expected - t.remitted;
-
-              return (
-                <div key={t.month} className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="font-semibold text-slate-800">{t.month}</span>
-                    <span className="font-mono text-slate-600">
-                      Remitted: {formatZMW(t.remitted)} / Exp: {formatZMW(t.expected)}
-                      {variance > 0 && (
-                        <span className="text-amber-600 font-medium ml-2">(-{formatZMW(variance)})</span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="h-6 bg-slate-100 rounded overflow-hidden flex flex-col justify-center gap-1 p-1">
-                    <div
-                      className="h-2 bg-slate-300 rounded transition-all"
-                      style={{ width: `${expectedPct}%` }}
-                      title={`Expected: ${formatZMW(t.expected)}`}
-                    ></div>
-                    <div
-                      className="h-2 bg-teal-600 rounded transition-all"
-                      style={{ width: `${remittedPct}%` }}
-                      title={`Remitted: ${formatZMW(t.remitted)}`}
-                    ></div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
-            <span>Note: September 2026 reflects partial reporting awaiting bank credit clearances.</span>
-            <button
-              onClick={() => setActiveTab('contributions')}
-              className="text-teal-700 hover:underline font-medium"
-            >
-              Open Full Reconciliation Ledger &rarr;
-            </button>
-          </div>
-        </div>
-
-        {/* Exception Breakdown & Status */}
-        <div className="bg-white border border-slate-200 rounded-lg p-5 flex flex-col justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-slate-900">Compliance Exception Breakdown</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Categorization of flagged records by detection rule</p>
-
-            <div className="mt-5 space-y-3">
-              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-                  <span className="font-medium text-slate-800">Rule A: Missing Schedules</span>
-                </div>
-                <span className="font-mono font-bold text-slate-900">{missingSchedulesCount} cases</span>
-              </div>
-
-              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                  <span className="font-medium text-slate-800">Rule C: Remittance Shortfall</span>
-                </div>
-                <span className="font-mono font-bold text-slate-900">
-                  {findings.filter((f) => f.ruleId === 'RULE_C_INCOMPLETE').length} cases
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                  <span className="font-medium text-slate-800">Rule B: Delayed Submissions</span>
-                </div>
-                <span className="font-mono font-bold text-slate-900">{delayedRecordsCount} cases</span>
-              </div>
-
-              <div className="p-2.5 rounded bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-                  <span className="font-medium text-slate-800">AI / ML Statistical Outliers</span>
-                </div>
-                <span className="font-mono font-bold text-slate-900">{anomalies.length} cases</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-5 pt-3 border-t border-slate-100">
-            <button
-              onClick={() => setActiveTab('compliance')}
-              className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded text-xs font-semibold transition-colors"
-            >
-              Inspect Deterministic Rule Findings
-            </button>
-          </div>
-        </div>
-      </div>
-
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 items-start">
       {/* Prioritized Investigation Queue Preview */}
-      <div className="bg-white border border-slate-200 rounded-lg p-5">
+      <div className="lg:col-span-7 min-w-0">
+      <div className="bg-white border border-slate-200 p-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div>
             <h2 className="text-sm font-bold text-slate-900">High-Priority Investigation Queue</h2>
@@ -311,7 +138,7 @@ export const OverviewDashboard: React.FC = () => {
           </div>
           <button
             onClick={() => setActiveTab('cases')}
-            className="text-xs text-teal-700 hover:text-teal-800 font-semibold flex items-center gap-1"
+            className="text-xs text-blue-700 hover:text-blue-800 font-semibold flex items-center gap-1"
           >
             <span>All Investigation Cases ({cases.length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -379,6 +206,24 @@ export const OverviewDashboard: React.FC = () => {
             </tbody>
           </table>
         </div>
+      </div>
+      </div>
+      <aside className="lg:col-span-3 border border-slate-200 bg-white p-4" aria-label="Compliance exception summary">
+        <h2 className="text-sm font-semibold text-slate-900">Exception register</h2>
+        <p className="mt-1 text-[11px] text-slate-500">Current period · {selectedPeriod === 'ALL' ? 'all cycles' : selectedPeriod}</p>
+        <dl className="mt-4 divide-y divide-slate-200 text-xs">
+          <div className="flex justify-between gap-3 py-2"><dt className="text-slate-600">Missing schedules</dt><dd className="font-mono font-semibold text-slate-900">{missingSchedulesCount}</dd></div>
+          <div className="flex justify-between gap-3 py-2"><dt className="text-slate-600">Remittance shortfall</dt><dd className="font-mono font-semibold text-slate-900">{findings.filter((f) => f.ruleId === 'RULE_C_INCOMPLETE').length}</dd></div>
+          <div className="flex justify-between gap-3 py-2"><dt className="text-slate-600">Delayed submissions</dt><dd className="font-mono font-semibold text-slate-900">{delayedRecordsCount}</dd></div>
+          <div className="flex justify-between gap-3 py-2"><dt className="text-slate-600">Statistical outliers</dt><dd className="font-mono font-semibold text-slate-900">{anomalies.length}</dd></div>
+        </dl>
+        <button onClick={() => setActiveTab('compliance')} className="mt-4 w-full border border-slate-300 px-3 py-2 text-left text-xs font-medium text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+          Review compliance findings <ArrowRight className="inline h-3.5 w-3.5 ml-1" />
+        </button>
+        <button onClick={() => setActiveTab('contributions')} className="mt-2 w-full border border-slate-300 px-3 py-2 text-left text-xs font-medium text-slate-800 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+          Open contribution ledger <ArrowRight className="inline h-3.5 w-3.5 ml-1" />
+        </button>
+      </aside>
       </div>
     </div>
   );

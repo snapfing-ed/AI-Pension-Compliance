@@ -41,7 +41,7 @@ export const ModelEvaluationView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-slate-900">Capstone Objective 3: Model Evaluation & Performance</h2>
-            <span className="text-[11px] font-semibold bg-teal-100 text-teal-800 px-2 py-0.5 rounded">
+            <span className="text-[11px] font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
               Empirical Research Validation
             </span>
           </div>
@@ -60,7 +60,7 @@ export const ModelEvaluationView: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white border border-slate-200 rounded-lg p-4">
           <div className="text-xs font-medium text-slate-500">Precision (PPV)</div>
-          <div className="text-2xl font-bold font-mono text-teal-700 mt-1">{(precision * 100).toFixed(1)}%</div>
+          <div className="text-2xl font-bold font-mono text-blue-700 mt-1">{(precision * 100).toFixed(1)}%</div>
           <p className="text-[11px] text-slate-500 mt-1">TP ÷ (TP + FP) · Reliability of flags</p>
         </div>
 
@@ -167,7 +167,7 @@ export const ModelEvaluationView: React.FC = () => {
 
             <div className="p-3 rounded bg-slate-50 border border-slate-200 flex justify-between items-center text-xs">
               <span className="text-slate-600 font-medium">Average Evaluation Latency Per Record</span>
-              <span className="font-mono font-bold text-teal-700">{avgTimePerRecordMs} ms / record</span>
+              <span className="font-mono font-bold text-blue-700">{avgTimePerRecordMs} ms / record</span>
             </div>
 
             <div className="p-3 rounded bg-slate-50 border border-slate-200 flex justify-between items-center text-xs">
@@ -217,7 +217,7 @@ export const ModelEvaluationView: React.FC = () => {
 
           <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
             <div className="font-bold text-slate-900 flex items-center gap-1.5">
-              <Cpu className="w-4 h-4 text-teal-600" />
+              <Cpu className="w-4 h-4 text-blue-600" />
               <span>AI / ML Statistical Anomaly Detection</span>
             </div>
             <p className="text-slate-600 leading-relaxed text-[11px]">

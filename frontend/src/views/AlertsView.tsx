@@ -65,7 +65,7 @@ export const AlertsView: React.FC = () => {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
             >
               <option value="ALL">All Categories</option>
               <option value="HIGH_PRIORITY">High-Priority Findings</option>
@@ -80,7 +80,7 @@ export const AlertsView: React.FC = () => {
               type="checkbox"
               checked={filterUnreadOnly}
               onChange={(e) => setFilterUnreadOnly(e.target.checked)}
-              className="rounded text-teal-600 focus:ring-teal-500"
+              className="rounded text-blue-600 focus:ring-blue-500"
             />
             <span className="text-slate-700 font-medium">Unread Only</span>
           </label>

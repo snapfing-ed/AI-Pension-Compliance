@@ -62,8 +62,8 @@ export const SystemSettingsView: React.FC = () => {
       </div>
 
       {saveToast && (
-        <div className="bg-teal-50 border border-teal-200 text-teal-800 rounded-lg p-3 text-xs flex items-center gap-2 animate-fade-in font-medium">
-          <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-3 text-xs flex items-center gap-2 animate-fade-in font-medium">
+          <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
           <span>{saveToast}</span>
         </div>
       )}
@@ -87,7 +87,7 @@ export const SystemSettingsView: React.FC = () => {
                 disabled={!isAdmin}
                 value={dueDay}
                 onChange={(e) => setDueDay(parseInt(e.target.value, 10) || 10)}
-                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-teal-500 disabled:bg-slate-100"
+                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-blue-500 disabled:bg-slate-100"
               />
               <p className="text-[11px] text-slate-500 mt-1">
                 Standard baseline due date for preceding month contributions (default: 10th of following month).
@@ -105,7 +105,7 @@ export const SystemSettingsView: React.FC = () => {
                 disabled={!isAdmin}
                 value={graceDays}
                 onChange={(e) => setGraceDays(parseInt(e.target.value, 10) || 5)}
-                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-teal-500 disabled:bg-slate-100"
+                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-blue-500 disabled:bg-slate-100"
               />
               <p className="text-[11px] text-slate-500 mt-1">
                 Buffer period before Rule A escalates missing schedule to formal notice (default: 5 calendar days).
@@ -132,7 +132,7 @@ export const SystemSettingsView: React.FC = () => {
                 disabled={!isAdmin}
                 value={shortfallZMW}
                 onChange={(e) => setShortfallZMW(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-teal-500 disabled:bg-slate-100"
+                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-blue-500 disabled:bg-slate-100"
               />
               <p className="text-[11px] text-slate-500 mt-1">
                 Variances below this floor are deemed rounding differences (default: K 500).
@@ -151,7 +151,7 @@ export const SystemSettingsView: React.FC = () => {
                 disabled={!isAdmin}
                 value={shortfallPct}
                 onChange={(e) => setShortfallPct(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-teal-500 disabled:bg-slate-100"
+                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-blue-500 disabled:bg-slate-100"
               />
               <p className="text-[11px] text-slate-500 mt-1">
                 Allowed proportional variance before Rule C triggers (default: 2.0%).
@@ -170,7 +170,7 @@ export const SystemSettingsView: React.FC = () => {
                 disabled={!isAdmin}
                 value={zScore}
                 onChange={(e) => setZScore(parseFloat(e.target.value) || 2.0)}
-                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-teal-500 disabled:bg-slate-100"
+                className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono text-slate-900 focus:outline-none focus:border-blue-500 disabled:bg-slate-100"
               />
               <p className="text-[11px] text-slate-500 mt-1">
                 Standard deviations from historical mean to flag anomalous drop (default: 2.0σ).

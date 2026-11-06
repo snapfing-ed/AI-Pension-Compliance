@@ -1,5 +1,5 @@
-export type UserRole = 'SYSTEM_ADMINISTRATOR' | 'COMPLIANCE_MONITOR';
-export type AccountStatus = 'ACTIVE' | 'PENDING_APPROVAL' | 'SUSPENDED';
+export type UserRole = 'SYSTEM_ADMINISTRATOR' | 'COMPLIANCE_SUPERVISOR' | 'COMPLIANCE_MONITOR';
+export type AccountStatus = 'ACTIVE' | 'PENDING' | 'LOCKED' | 'DISABLED' | 'PENDING_APPROVAL' | 'SUSPENDED';
 
 export interface User {
   id: string; // e.g. USR-001
@@ -12,6 +12,8 @@ export interface User {
   lastLogin: string | null;
   passwordHash?: string;
   passwordSalt?: string;
+  username?: string;
+  mustChangePassword?: boolean;
 }
 
 export type SessionUser = Omit<User, 'passwordHash' | 'passwordSalt'>;

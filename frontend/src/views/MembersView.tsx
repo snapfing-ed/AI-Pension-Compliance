@@ -45,7 +45,7 @@ export const MembersView: React.FC = () => {
             placeholder="Search by member ref (e.g. MEM-ZM-80101) or initial..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white"
           />
         </div>
 
@@ -54,7 +54,7 @@ export const MembersView: React.FC = () => {
           <select
             value={employerFilter}
             onChange={(e) => setEmployerFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Employers</option>
             {employers.map((emp) => (
@@ -124,7 +124,7 @@ export const MembersView: React.FC = () => {
       {/* Member Detail Modal */}
       {selectedMember && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full border border-slate-200 p-5">
+          <div className="bg-white rounded-lg shadow-sm max-w-lg w-full border border-slate-200 p-5">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
                 <span className="font-mono text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
@@ -154,7 +154,7 @@ export const MembersView: React.FC = () => {
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
                 <span className="text-slate-500">Standard Statutory Rate (10% Combined):</span>
-                <span className="font-mono font-bold text-teal-700">
+                <span className="font-mono font-bold text-blue-700">
                   {formatZMW(selectedMember.expectedMonthlyContribution)}
                 </span>
               </div>
