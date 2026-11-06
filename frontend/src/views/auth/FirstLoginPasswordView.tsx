@@ -42,7 +42,7 @@ export const FirstLoginPasswordView: React.FC = () => {
 
         {/* Brand strip */}
         <div className="flex items-center gap-2.5 justify-center mb-8">
-          <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xs shrink-0">
             SC
           </div>
           <span className="text-sm font-semibold text-slate-900">SmartCompliance</span>
@@ -52,8 +52,8 @@ export const FirstLoginPasswordView: React.FC = () => {
 
           {/* Icon and heading */}
           <div className="space-y-1">
-            <div className="w-10 h-10 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center mb-4">
-              <KeyRound className="w-5 h-5 text-teal-600" />
+            <div className="w-10 h-10 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center mb-4">
+              <KeyRound className="w-5 h-5 text-blue-600" />
             </div>
             <h1 className="text-xl font-bold text-slate-900 tracking-tight">Set your password</h1>
             <p className="text-sm text-slate-500 leading-relaxed">
@@ -86,17 +86,17 @@ export const FirstLoginPasswordView: React.FC = () => {
                   autoComplete={complete}
                   value={value}
                   onChange={(e) => setter(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-900 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-shadow"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-sm text-slate-900 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
                 />
               </div>
             ))}
 
             {/* Inline hints */}
             <ul className="space-y-1 text-[11px] text-slate-500">
-              <li className={lengthOk && next.length > 0 ? 'text-teal-600' : ''}>
+              <li className={lengthOk && next.length > 0 ? 'text-blue-600' : ''}>
                 · 12 to 72 characters
               </li>
-              <li className={passwordsMatch ? 'text-teal-600' : ''}>
+              <li className={passwordsMatch ? 'text-blue-600' : ''}>
                 · New passwords match
               </li>
             </ul>

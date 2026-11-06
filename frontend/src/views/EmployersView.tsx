@@ -136,7 +136,7 @@ export const EmployersView: React.FC = () => {
             placeholder="Search by employer name, ID (e.g. EMP-ZM-1001), or town..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white transition-colors"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white transition-colors"
           />
         </div>
 
@@ -146,7 +146,7 @@ export const EmployersView: React.FC = () => {
             <select
               value={sectorFilter}
               onChange={(e) => setSectorFilter(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+              className="bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
             >
               <option value="ALL">All Sectors ({sectors.length})</option>
               {sectors.map((s) => (
@@ -162,7 +162,7 @@ export const EmployersView: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+              className="bg-slate-50 border border-slate-200 rounded px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
             >
               <option value="ALL">All Statuses</option>
               <option value="NORMAL">Normal Standing</option>
@@ -242,7 +242,7 @@ export const EmployersView: React.FC = () => {
       {/* Employer Detail Modal */}
       {selectedEmployer && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-200">
+          <div className="bg-white rounded-lg shadow-sm max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-200">
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-200 flex items-start justify-between">
               <div>
@@ -401,7 +401,7 @@ export const EmployersView: React.FC = () => {
                           </div>
                           <div className="text-slate-900 font-medium mt-1">{c.title}</div>
                           {c.finalOutcome && (
-                            <div className="text-[11px] text-teal-700 font-medium mt-1">
+                            <div className="text-[11px] text-blue-700 font-medium mt-1">
                               Outcome: {c.finalOutcome.replace('_', ' ')}
                             </div>
                           )}
@@ -429,7 +429,7 @@ export const EmployersView: React.FC = () => {
       {/* Add Employer Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full border border-slate-200 p-5">
+          <div className="bg-white rounded-lg shadow-sm max-w-lg w-full border border-slate-200 p-5">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="text-sm font-bold text-slate-900">Register Synthetic Demonstration Employer</h3>
               <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-slate-600">
@@ -446,7 +446,7 @@ export const EmployersView: React.FC = () => {
                   placeholder="e.g. Copperbelt Agro Logistics Ltd"
                   value={newEmpName}
                   onChange={(e) => setNewEmpName(e.target.value)}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-teal-500"
+                  className="w-full px-3 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -456,7 +456,7 @@ export const EmployersView: React.FC = () => {
                   <select
                     value={newEmpSector}
                     onChange={(e) => setNewEmpSector(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-teal-500"
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-blue-500"
                   >
                     <option value="Mining & Mineral Extraction">Mining & Mineral Extraction</option>
                     <option value="Banking & Financial Services">Banking & Financial Services</option>
@@ -473,7 +473,7 @@ export const EmployersView: React.FC = () => {
                     type="text"
                     value={newEmpLocation}
                     onChange={(e) => setNewEmpLocation(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -486,7 +486,7 @@ export const EmployersView: React.FC = () => {
                     min="1"
                     value={newEmpMembers}
                     onChange={(e) => setNewEmpMembers(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -497,7 +497,7 @@ export const EmployersView: React.FC = () => {
                     step="500"
                     value={newEmpContrib}
                     onChange={(e) => setNewEmpContrib(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -510,7 +510,7 @@ export const EmployersView: React.FC = () => {
                     placeholder="payroll@company.co.zm"
                     value={newEmpEmail}
                     onChange={(e) => setNewEmpEmail(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -519,7 +519,7 @@ export const EmployersView: React.FC = () => {
                     type="text"
                     value={newEmpPhone}
                     onChange={(e) => setNewEmpPhone(e.target.value)}
-                    className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>

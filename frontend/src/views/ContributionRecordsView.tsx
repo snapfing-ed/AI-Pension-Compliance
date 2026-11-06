@@ -117,7 +117,7 @@ export const ContributionRecordsView: React.FC = () => {
             placeholder="Search by employer name, record ID, or bank reference..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white"
           />
         </div>
 
@@ -126,7 +126,7 @@ export const ContributionRecordsView: React.FC = () => {
           <select
             value={periodFilter}
             onChange={(e) => setPeriodFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Periods ({periods.length})</option>
             {periods.map((p) => (
@@ -142,7 +142,7 @@ export const ContributionRecordsView: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="RECONCILED">Reconciled</option>
@@ -212,7 +212,7 @@ export const ContributionRecordsView: React.FC = () => {
                               ? 'bg-rose-100 text-rose-800'
                               : r.status === 'OVERDUE'
                               ? 'bg-blue-100 text-blue-800'
-                              : 'bg-purple-100 text-purple-800'
+                              : 'bg-blue-100 text-blue-800'
                           }`}
                         >
                           {r.status.replace('_', ' ')}
@@ -238,7 +238,7 @@ export const ContributionRecordsView: React.FC = () => {
       {/* Record Reconciliation Detail Modal */}
       {selectedRecord && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full border border-slate-200 p-6">
+          <div className="bg-white rounded-lg shadow-sm max-w-2xl w-full border border-slate-200 p-6">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
                 <span className="font-mono text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
@@ -273,7 +273,7 @@ export const ContributionRecordsView: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-slate-500 font-medium">3. Bank Remittance</div>
-                  <div className="text-sm font-bold font-mono text-teal-700 mt-1">
+                  <div className="text-sm font-bold font-mono text-blue-700 mt-1">
                     {selectedRecord.remittedAmount > 0 ? formatZMW(selectedRecord.remittedAmount) : 'None (K 0.00)'}
                   </div>
                   <div className="text-[10px] text-slate-500 mt-0.5">Verified treasury deposit</div>

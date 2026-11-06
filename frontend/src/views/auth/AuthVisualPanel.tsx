@@ -16,7 +16,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login'
 
       {/* Brand */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
           SC
         </div>
         <div>
@@ -31,8 +31,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login'
           {headline}
         </h1>
         <p className="text-sm text-slate-400 leading-relaxed max-w-xs">
-          A decision-support system that identifies potentially missing, delayed, incomplete
-          or unusual contribution records and prioritises cases for human investigation.
+          A decision-support system that identifies potentially missing, delayed, incomplete or unusual contribution records and prioritises cases for human investigation.
         </p>
 
       </div>

@@ -20,6 +20,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 @Configuration
@@ -99,6 +102,23 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .sessionFixation(fixation -> fixation.migrateSession())
+            )
+
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                        "{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Authentication required.\"}"
+                    );
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                        "{\"status\":403,\"error\":\"Forbidden\",\"message\":\"You are not authorised to perform this operation.\"}"
+                    );
+                })
             )
 
             .formLogin(AbstractHttpConfigurer::disable)

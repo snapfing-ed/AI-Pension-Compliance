@@ -72,7 +72,7 @@ export const AIRiskAnalysisView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-slate-900">AI Risk Analysis & Anomaly Explainability</h2>
-            <span className="text-[11px] font-semibold bg-teal-100 text-teal-800 px-2 py-0.5 rounded">
+            <span className="text-[11px] font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
               Replaceable ML Service Layer
             </span>
           </div>
@@ -102,8 +102,8 @@ export const AIRiskAnalysisView: React.FC = () => {
       </div>
 
       {scanToast && (
-        <div className="bg-teal-50 border border-teal-200 text-teal-800 rounded-lg p-3 text-xs flex items-center gap-2 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-3 text-xs flex items-center gap-2 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
           <span className="font-medium">{scanToast}</span>
         </div>
       )}
@@ -176,7 +176,7 @@ export const AIRiskAnalysisView: React.FC = () => {
             placeholder="Search anomalies by employer name or reason..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white"
           />
         </div>
 
@@ -185,7 +185,7 @@ export const AIRiskAnalysisView: React.FC = () => {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Categories</option>
             <option value="ABRUPT_DROP">Abrupt Volume Drop</option>
@@ -200,7 +200,7 @@ export const AIRiskAnalysisView: React.FC = () => {
           <select
             value={riskBandFilter}
             onChange={(e) => setRiskBandFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Risk Bands</option>
             <option value="CRITICAL">Critical (&gt;80)</option>

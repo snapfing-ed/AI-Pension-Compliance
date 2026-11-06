@@ -112,7 +112,7 @@ export const ReportsView: React.FC = () => {
             <select
               value={reportType}
               onChange={(e: any) => setReportType(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 font-semibold focus:outline-none focus:border-teal-500"
+              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 font-semibold focus:outline-none focus:border-blue-500"
             >
               <option value="EXECUTIVE">Executive Compliance Summary</option>
               <option value="SHORTFALLS">Unreconciled Shortfalls & Exceptions</option>
@@ -126,7 +126,7 @@ export const ReportsView: React.FC = () => {
             <select
               value={selectedEmployerId}
               onChange={(e) => setSelectedEmployerId(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
             >
               <option value="ALL">All Employers</option>
               {employers.map((emp) => (
@@ -142,7 +142,7 @@ export const ReportsView: React.FC = () => {
             <select
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+              className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
             >
               <option value="ALL">All Reporting Cycles</option>
               <option value="2026-09">September 2026</option>
@@ -159,7 +159,7 @@ export const ReportsView: React.FC = () => {
         <div className="border-b border-slate-900/10 pb-5">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-[11px] font-bold uppercase tracking-wider text-teal-800">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-blue-800">
                 PENSION COMPLIANCE INTELLIGENCE SYSTEM
               </div>
               <h1 className="text-xl font-bold text-slate-900 mt-0.5">
@@ -206,7 +206,7 @@ export const ReportsView: React.FC = () => {
           </div>
           <div>
             <div className="text-[11px] font-medium text-slate-500">Verified Bank Remittances</div>
-            <div className="text-base font-bold font-mono text-teal-700 mt-1">{formatZMW(totalRemitted)}</div>
+            <div className="text-base font-bold font-mono text-blue-700 mt-1">{formatZMW(totalRemitted)}</div>
           </div>
           <div>
             <div className="text-[11px] font-medium text-slate-500">Unreconciled Net Shortfall</div>
@@ -329,7 +329,7 @@ export const ReportsView: React.FC = () => {
                         {formatZMW(c.monetaryDiscrepancy)}
                       </td>
                       <td className="py-2.5 px-3 text-slate-700">{c.assignedOfficerName}</td>
-                      <td className="py-2.5 px-3 font-semibold text-teal-800">
+                      <td className="py-2.5 px-3 font-semibold text-blue-800">
                         {c.finalOutcome ? c.finalOutcome.replace('_', ' ') : 'Under Active Investigation'}
                       </td>
                     </tr>

@@ -1,6 +1,20 @@
 @import "tailwindcss";
 
 @layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body,
+  #root {
+    min-width: 320px;
+    min-height: 100%;
+    margin: 0;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
@@ -9,6 +23,188 @@
     font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-variant-numeric: tabular-nums;
   }
+}
+
+/* Responsive presentation for the existing application UI. */
+@media (max-width: 767px) {
+  /* Stack the navigation above the active view on phones. */
+  #root > div.flex.min-h-screen {
+    flex-direction: column;
+  }
+
+  #root aside[aria-label="Application navigation"] {
+    width: 100%;
+    min-height: 0;
+    max-height: 42vh;
+    border-right: 0;
+    border-bottom: 1px solid rgb(30 41 59);
+  }
+
+  #root aside[aria-label="Application navigation"] > div:first-child {
+    padding: 0.65rem 0.85rem;
+  }
+
+  #root aside[aria-label="Application navigation"] nav {
+    display: flex;
+    flex: none;
+    gap: 0.35rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem 0.75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root aside[aria-label="Application navigation"] nav > div:first-child {
+    display: none;
+  }
+
+  #root aside[aria-label="Application navigation"] nav button {
+    width: auto;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.55rem 0.7rem;
+  }
+
+  #root aside[aria-label="Application navigation"] nav button > div {
+    overflow: visible;
+  }
+
+  #root aside[aria-label="Application navigation"] nav button span {
+    overflow: visible;
+  }
+
+  #root aside[aria-label="Application navigation"] > div:last-child {
+    display: none;
+  }
+
+  #root > div.flex.min-h-screen > div.flex-1 {
+    width: 100%;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  #root header {
+    min-height: 3.5rem;
+    height: auto;
+    padding: 0.65rem 0.8rem;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  #root header > div:first-child {
+    flex: 1 1 auto;
+  }
+
+  #root header > div:last-child {
+    gap: 0.3rem;
+  }
+
+  #main-content {
+    overflow-x: hidden;
+  }
+
+  #main-content .p-6 {
+    padding: 1rem;
+  }
+
+  #main-content .p-8 {
+    padding: 1.25rem;
+  }
+
+  #main-content [class*="min-w-[240px]"] {
+    min-width: min(100%, 15rem);
+  }
+
+  #main-content [class*="grid-cols-"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #main-content table {
+    min-width: 38rem;
+  }
+
+  #main-content input,
+  #main-content select,
+  #main-content textarea {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  #root aside[aria-label="Application navigation"] {
+    width: 13rem;
+  }
+
+  #main-content .p-6 {
+    padding: 1.25rem;
+  }
+
+  #main-content [class*="grid-cols-4"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Compact enterprise visual system */
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl,
+.rounded-3xl {
+  border-radius: 6px !important;
+}
+
+.shadow-sm,
+.shadow-xs,
+.shadow-2xs,
+.shadow-md,
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: none !important;
+}
+
+#main-content div[class~="shadow-sm"][class*="max-w-"] {
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.12) !important;
+}
+
+button[class~="bg-slate-900"] {
+  background-color: rgb(37 99 235);
+}
+
+button[class~="bg-slate-900"]:hover,
+button[class~="hover:bg-slate-800"]:hover {
+  background-color: rgb(29 78 216);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgb(37 99 235);
+  outline-offset: 2px;
+}
+
+#main-content table {
+  border-collapse: collapse;
+}
+
+#main-content table th,
+#main-content table td {
+  padding: 0.5rem 0.75rem !important;
+}
+
+#main-content table tbody tr:nth-child(even) {
+  background-color: rgb(248 250 252 / 0.72);
+}
+
+#main-content table tbody tr:hover {
+  background-color: rgb(241 245 249);
+}
+
+#main-content table th {
+  text-align: left;
+  white-space: nowrap;
+  font-weight: 600;
 }
 
 @media print {

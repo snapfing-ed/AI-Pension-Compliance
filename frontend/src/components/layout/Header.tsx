@@ -18,14 +18,14 @@ export const Header: React.FC = () => {
     'Compliance Monitor Role';
 
   const roleColor =
-    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'text-purple-700' :
-    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'text-indigo-700' :
-    'text-teal-700';
+    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'text-blue-700' :
+    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'text-blue-700' :
+    'text-blue-700';
 
   const avatarColor =
-    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'bg-purple-700' :
-    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'bg-indigo-700' :
-    'bg-teal-700';
+    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'bg-blue-700' :
+    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'bg-blue-700' :
+    'bg-blue-700';
 
   const avatarLabel =
     currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'System Admin' :
@@ -93,8 +93,8 @@ export const Header: React.FC = () => {
 
       {/* Zone 2: Toast */}
       {toastMessage && (
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded bg-teal-50 border border-teal-200 text-teal-800 text-xs font-medium">
-          <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+        <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 text-xs font-medium">
+          <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}

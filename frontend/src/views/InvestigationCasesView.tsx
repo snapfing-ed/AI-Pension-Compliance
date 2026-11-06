@@ -150,7 +150,7 @@ export const InvestigationCasesView: React.FC = () => {
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <ListOrdered className="w-3.5 h-3.5 text-teal-600" />
+            <ListOrdered className="w-3.5 h-3.5 text-blue-600" />
             <span>Prioritised Work Queue</span>
           </button>
         </div>
@@ -175,7 +175,7 @@ export const InvestigationCasesView: React.FC = () => {
             placeholder="Search cases by case number, employer, or subject..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white"
           />
         </div>
 
@@ -184,7 +184,7 @@ export const InvestigationCasesView: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="NEW">New</option>
@@ -201,7 +201,7 @@ export const InvestigationCasesView: React.FC = () => {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Priorities</option>
             <option value="URGENT">Urgent (80+ pts)</option>
@@ -269,7 +269,7 @@ export const InvestigationCasesView: React.FC = () => {
                           c.status === 'RESOLVED' || c.status === 'CLOSED'
                             ? 'bg-emerald-50 text-emerald-800'
                             : c.status === 'ESCALATED'
-                            ? 'bg-purple-100 text-purple-800'
+                            ? 'bg-blue-100 text-blue-800'
                             : c.status === 'AWAITING_INFO'
                             ? 'bg-amber-100 text-amber-800'
                             : 'bg-slate-100 text-slate-800'
@@ -299,7 +299,7 @@ export const InvestigationCasesView: React.FC = () => {
       {/* Case Detail & Workflow Drawer / Modal */}
       {selectedCase && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[92vh] overflow-y-auto border border-slate-200">
+          <div className="bg-white rounded-lg shadow-sm max-w-4xl w-full max-h-[92vh] overflow-y-auto border border-slate-200">
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-200 flex items-start justify-between bg-slate-50/50">
               <div>
@@ -312,7 +312,7 @@ export const InvestigationCasesView: React.FC = () => {
                       selectedCase.status === 'RESOLVED' || selectedCase.status === 'CLOSED'
                         ? 'bg-emerald-100 text-emerald-800'
                         : selectedCase.status === 'ESCALATED'
-                        ? 'bg-purple-100 text-purple-800'
+                        ? 'bg-blue-100 text-blue-800'
                         : 'bg-blue-100 text-blue-800'
                     }`}
                   >
@@ -394,7 +394,7 @@ export const InvestigationCasesView: React.FC = () => {
                       setNextStatus('ESCALATED');
                       setShowStatusModal(true);
                     }}
-                    className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-800 rounded font-medium shadow-2xs"
+                    className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 rounded font-medium shadow-2xs"
                   >
                     Escalate to Supervisor
                   </button>
@@ -504,7 +504,7 @@ export const InvestigationCasesView: React.FC = () => {
                     placeholder="Enter factual case notes, verification steps, or communication log..."
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
-                    className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white resize-none"
+                    className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white resize-none"
                   />
                   <button
                     type="submit"
@@ -533,7 +533,7 @@ export const InvestigationCasesView: React.FC = () => {
       {/* Status Transition Modal with Required Outcome for Resolution */}
       {showStatusModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-60">
-          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full border border-slate-200 p-5">
+          <div className="bg-white rounded-lg shadow-sm max-w-md w-full border border-slate-200 p-5">
             <h3 className="text-sm font-bold text-slate-900">Transition Investigation Case Status</h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Target Status: <span className="font-semibold text-slate-900">{nextStatus}</span>
@@ -548,7 +548,7 @@ export const InvestigationCasesView: React.FC = () => {
                   <select
                     value={selectedOutcome}
                     onChange={(e: any) => setSelectedOutcome(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded font-medium focus:outline-none focus:border-teal-500"
+                    className="w-full px-2.5 py-1.5 border border-slate-300 rounded font-medium focus:outline-none focus:border-blue-500"
                   >
                     <option value="CONTRIBUTION_RECONCILED">Contribution Reconciled</option>
                     <option value="EXPLANATION_RECEIVED">Explanation Received & Accepted</option>
@@ -570,7 +570,7 @@ export const InvestigationCasesView: React.FC = () => {
                   placeholder="Summarize the verification steps taken and factual justification for this transition..."
                   value={outcomeSummary}
                   onChange={(e) => setOutcomeSummary(e.target.value)}
-                  className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-teal-500 resize-none"
+                  className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-blue-500 resize-none"
                 />
               </div>
 
@@ -597,7 +597,7 @@ export const InvestigationCasesView: React.FC = () => {
       {/* Priority Override Modal */}
       {showPriorityModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-60">
-          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full border border-slate-200 p-5">
+          <div className="bg-white rounded-lg shadow-sm max-w-md w-full border border-slate-200 p-5">
             <h3 className="text-sm font-bold text-slate-900">Manual Priority Override</h3>
             <p className="text-xs text-slate-500 mt-0.5">
               Authorised officers may adjust urgency with an auditable justification.
@@ -628,7 +628,7 @@ export const InvestigationCasesView: React.FC = () => {
                   placeholder="Record why this case priority is being manually modified..."
                   value={overrideReason}
                   onChange={(e) => setOverrideReason(e.target.value)}
-                  className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-teal-500 resize-none"
+                  className="w-full p-2 border border-slate-300 rounded focus:outline-none focus:border-blue-500 resize-none"
                 />
               </div>
 

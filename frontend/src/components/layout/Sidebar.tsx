@@ -37,31 +37,31 @@ export const Sidebar: React.FC = () => {
     'COMPLIANCE MONITOR';
 
   const roleBadgeColor =
-    isAdmin ? 'bg-purple-900/80 text-purple-200' :
-    isSupervisor ? 'bg-indigo-900/80 text-indigo-200' :
-    'bg-teal-900/80 text-teal-200';
+    isAdmin ? 'bg-blue-900/80 text-blue-200' :
+    isSupervisor ? 'bg-blue-900/80 text-blue-200' :
+    'bg-blue-900/80 text-blue-200';
 
   const accentColor =
-    isAdmin ? 'bg-purple-600' :
-    isSupervisor ? 'bg-indigo-600' :
-    'bg-teal-600';
+    isAdmin ? 'bg-blue-600' :
+    isSupervisor ? 'bg-blue-600' :
+    'bg-blue-600';
 
   const activeItemColor =
     isAdmin
-      ? 'bg-purple-600/20 text-purple-300 border-l-2 border-purple-400'
+      ? 'bg-blue-600/20 text-blue-300 border-l-2 border-blue-400'
       : isSupervisor
-      ? 'bg-indigo-600/20 text-indigo-300 border-l-2 border-indigo-400'
-      : 'bg-teal-600/20 text-teal-300 border-l-2 border-teal-400';
+      ? 'bg-blue-600/20 text-blue-300 border-l-2 border-blue-400'
+      : 'bg-blue-600/20 text-blue-300 border-l-2 border-blue-400';
 
   const activeIconColor =
-    isAdmin ? 'text-purple-400' :
-    isSupervisor ? 'text-indigo-400' :
-    'text-teal-400';
+    isAdmin ? 'text-blue-400' :
+    isSupervisor ? 'text-blue-400' :
+    'text-blue-400';
 
   const capstoneColor =
-    isAdmin ? 'text-purple-400' :
-    isSupervisor ? 'text-indigo-400' :
-    'text-teal-400';
+    isAdmin ? 'text-blue-400' :
+    isSupervisor ? 'text-blue-400' :
+    'text-blue-400';
 
   const navSectionLabel =
     isAdmin ? 'System Administration & Oversight' :
@@ -120,10 +120,6 @@ export const Sidebar: React.FC = () => {
             </h1>
             <p className="text-xs text-slate-400 truncate">Pension Compliance System</p>
           </div>
-        </div>
-        <div className="mt-3 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-          <span>Mulungushi University</span>
-          <span className={`font-medium ${capstoneColor}`}>BSc CS Capstone</span>
         </div>
       </div>
 

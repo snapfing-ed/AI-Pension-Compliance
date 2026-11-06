@@ -81,7 +81,7 @@ const RootRouter: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white space-y-3">
-        <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white font-bold text-xl animate-pulse">
+        <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl animate-pulse">
           SC
         </div>
         <div className="text-sm font-semibold tracking-wide">Initialising SmartCompliance...</div>
