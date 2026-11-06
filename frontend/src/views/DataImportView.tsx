@@ -224,7 +224,7 @@ EMP-ZM-1006,Zambezi Grains & Agri-Ventures,2026-10,175000,175000,175000,2026-10-
             onClick={handleLoadSampleProblematic}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded text-xs font-semibold"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-teal-600" />
+            <RotateCcw className="w-3.5 h-3.5 text-blue-600" />
             <span>Load Test CSV with Mixed Errors</span>
           </button>
         </div>
@@ -269,7 +269,7 @@ EMP-ZM-1006,Zambezi Grains & Agri-Ventures,2026-10,175000,175000,175000,2026-10-
               setRawText(e.target.value);
               validateCSVText(e.target.value);
             }}
-            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded font-mono text-[11px] text-slate-800 focus:outline-none focus:border-teal-500 focus:bg-white resize-y"
+            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded font-mono text-[11px] text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white resize-y"
           />
         </div>
       </div>

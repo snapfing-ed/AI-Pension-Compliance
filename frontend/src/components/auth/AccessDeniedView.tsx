@@ -41,7 +41,7 @@ export const AccessDeniedView: React.FC<AccessDeniedViewProps> = ({
       <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600 max-w-md mx-auto text-left space-y-1">
         <div className="font-semibold text-slate-800">Security Invariant Enforced:</div>
         <p className="text-[11px] text-slate-500">
-          This operation requires the <span className="font-mono text-purple-700 font-bold">{requiredRole}</span>{' '}
+          This operation requires the <span className="font-mono text-blue-700 font-bold">{requiredRole}</span>{' '}
           role. All unauthorized access attempts are recorded in the security audit trail.
         </p>
       </div>

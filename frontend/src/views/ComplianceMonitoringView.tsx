@@ -87,8 +87,8 @@ export const ComplianceMonitoringView: React.FC = () => {
 
       {/* Execution Feedback Notification */}
       {lastRunSummary && (
-        <div className="bg-teal-50 border border-teal-200 text-teal-800 rounded-lg p-3 text-xs flex items-center gap-2 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-teal-600 shrink-0" />
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 rounded-lg p-3 text-xs flex items-center gap-2 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
           <span className="font-medium">{lastRunSummary}</span>
         </div>
       )}
@@ -136,7 +136,7 @@ export const ComplianceMonitoringView: React.FC = () => {
             placeholder="Search findings by employer or reason..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-teal-500 focus:bg-white"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:outline-none focus:border-blue-500 focus:bg-white"
           />
         </div>
 
@@ -145,7 +145,7 @@ export const ComplianceMonitoringView: React.FC = () => {
           <select
             value={ruleFilter}
             onChange={(e) => setRuleFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Detection Rules</option>
             <option value="RULE_A_MISSING">Rule A: Missing Schedule</option>
@@ -161,7 +161,7 @@ export const ComplianceMonitoringView: React.FC = () => {
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-teal-500"
+            className="bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500"
           >
             <option value="ALL">All Severities</option>
             <option value="CRITICAL">Critical</option>
