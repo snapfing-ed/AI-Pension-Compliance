@@ -29,3 +29,4 @@ INSERT INTO contribution_rule_version (
     'NAPSA contribution calculator (napsa.co.zm), accessed 7 Nov 2026. 2026 earnings ceiling ZMW 37,236.00 (maximum 1,861.80 per party), corroborated by independent payroll and tax sources; SI 103 of 2025 (gazetted 30 Dec 2025) identified as the probable instrument, not yet read. Assumptions: half-up rounding to 2 dp; continuous 5% calculation; due date 10th of following month, boundary and weekend handling unconfirmed.',
     'VERIFIED'
 );
+
