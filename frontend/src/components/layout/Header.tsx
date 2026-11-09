@@ -17,22 +17,15 @@ export const Header: React.FC = () => {
     currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'Compliance Supervisor Role' :
     'Compliance Monitor Role';
 
-  const roleColor =
-    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'text-blue-700' :
-    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'text-blue-700' :
-    'text-blue-700';
-
-  const avatarColor =
-    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'bg-blue-700' :
-    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'bg-blue-700' :
-    'bg-blue-700';
-
   const avatarLabel =
     currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'System Admin' :
     currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'Supervisor' :
     'Compliance Monitor';
 
   const sectionLabel = isAdmin ? 'Administration' : 'Monitoring Operations';
+
+  const displayName = currentUser?.displayName || (currentUser as any)?.name || currentUser?.username || 'User';
+  const displayEmail = currentUser?.institutionalEmail || (currentUser as any)?.email || '';
 
   const handleRunChecks = () => {
     setIsRunning(true);
@@ -49,8 +42,12 @@ export const Header: React.FC = () => {
   const titles: Record<string, string> = {
     'admin-overview': 'System Administration Console',
     overview: 'Compliance Monitoring Dashboard',
+    users: 'User Accounts & Access Control',
     employers: 'Employer Directory & Profiles',
     members: 'Registered Members Directory',
+    periods: 'Contribution Periods & Data Sources',
+    payroll: 'Payroll Batches & Records',
+    rules: 'Contribution Rules & Calculator',
     contributions: 'Contribution Reconciliation Ledger',
     compliance: 'Compliance Monitoring Engine',
     'ai-risk': 'AI Anomaly Analysis & Explainability',
@@ -59,14 +56,19 @@ export const Header: React.FC = () => {
     reports: 'Compliance Reports & Analytics',
     import: 'Contribution Data Import & Validation',
     evaluation: 'Model Evaluation & System Performance',
-    users: 'User Accounts & Access Control',
     audit: 'Security & Activity Audit Logs',
-    settings: 'System Configuration & Demonstration Thresholds',
+    settings: 'System Configuration & Thresholds',
   };
+
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
-
       {/* Zone 1: Breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
         <div>
@@ -78,15 +80,17 @@ export const Header: React.FC = () => {
             </span>
           </div>
           <div className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5 flex-wrap">
-            <span className="font-semibold text-slate-700 truncate max-w-[160px] sm:max-w-none">
-              {currentUser?.email}
-            </span>
-            <span aria-hidden="true" className="hidden sm:inline">·</span>
+            {displayEmail && (
+              <>
+                <span className="font-semibold text-slate-700 truncate max-w-[160px] sm:max-w-none">
+                  {displayEmail}
+                </span>
+                <span aria-hidden="true" className="hidden sm:inline">·</span>
+              </>
+            )}
             <span className="hidden sm:inline">Lusaka (UTC+2)</span>
             <span aria-hidden="true" className="hidden sm:inline">·</span>
-            <span className={`font-semibold ${roleColor}`}>
-              {roleLabel}
-            </span>
+            <span className="font-semibold text-blue-700">{roleLabel}</span>
           </div>
         </div>
       </div>
@@ -128,16 +132,14 @@ export const Header: React.FC = () => {
 
         <div className="flex items-center gap-2">
           <div
-            className={`w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-bold font-mono shrink-0 ${avatarColor}`}
+            className="w-7 h-7 rounded-full bg-blue-700 text-white flex items-center justify-center text-xs font-bold font-mono shrink-0"
             aria-hidden="true"
           >
-            {currentUser?.name
-              ? currentUser.name.split(' ').map((n) => n[0]).join('').slice(0, 2)
-              : 'U'}
+            {initials || 'U'}
           </div>
           <div className="hidden sm:block text-left text-xs">
             <div className="font-semibold text-slate-900 leading-tight truncate max-w-[130px]">
-              {currentUser?.name}
+              {displayName}
             </div>
             <div className="text-[10px] text-slate-500 font-mono">
               {avatarLabel}

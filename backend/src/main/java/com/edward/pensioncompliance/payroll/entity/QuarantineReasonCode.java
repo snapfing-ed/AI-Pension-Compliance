@@ -1,0 +1,13 @@
+package com.edward.pensioncompliance.payroll.entity;
+
+public enum QuarantineReasonCode {
+    MISSING_MEMBER_REF,
+    INVALID_MEMBER_REF,
+    NEGATIVE_GROSS_PAY,
+    INVALID_PAY_FORMAT,
+    DUPLICATE_MEMBER_IN_BATCH,
+    DUPLICATE_SOURCE_ROW_REF,
+    INVALID_PAYROLL_STATUS,
+    INVALID_SOURCE_ROW_REF,
+    MULTIPLE_VALIDATION_ERRORS
+}
