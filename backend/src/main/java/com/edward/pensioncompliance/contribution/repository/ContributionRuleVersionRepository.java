@@ -10,5 +10,7 @@ import java.util.List;
 public interface ContributionRuleVersionRepository
         extends Repository<ContributionRuleVersion, Long> {
 
+    List<ContributionRuleVersion> findAllByOrderByRuleCodeAscVersionNoAsc();
+
     List<ContributionRuleVersion> findByRuleCodeOrderByVersionNoAsc(String ruleCode);
 }
