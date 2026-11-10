@@ -350,9 +350,9 @@ export const UserManagementPage: React.FC = () => {
                     <td className="py-3.5 px-4">
                       <select
                         className={`border px-2.5 py-1 rounded-md text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                          ROLE_BADGE[u.role] ?? 'bg-slate-100 text-slate-700 border-slate-200'
+                          ROLE_BADGE[u.roleCode] ?? 'bg-slate-100 text-slate-700 border-slate-200'
                         }`}
-                        value={u.role}
+                        value={u.roleCode}
                         onChange={(e) => handleRoleChange(u.userId, e.target.value as RoleCode)}
                       >
                         {ROLES.map((r) => (

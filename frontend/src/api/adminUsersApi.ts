@@ -6,7 +6,7 @@ export interface AdminUser {
   username: string;
   displayName: string;
   institutionalEmail: string;
-  role: RoleCode;
+  roleCode: RoleCode;
   accountStatus: AccountStatus;
   mustChangePassword: boolean;
 }
@@ -59,7 +59,7 @@ export const adminUsersApi = {
     if (Array.isArray(data)) {
       let filtered = data;
       if (params.status) filtered = filtered.filter((u) => u.accountStatus === params.status);
-      if (params.role) filtered = filtered.filter((u) => u.role === params.role);
+      if (params.role) filtered = filtered.filter((u) => u.roleCode === params.role);
       const size = params.size ?? 20;
       const page = params.page ?? 0;
       const start = page * size;

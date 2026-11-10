@@ -189,7 +189,7 @@ export const RulesCalculatorPage: React.FC = () => {
                   <th className="py-3 px-4 font-semibold">Rule Code</th>
                   <th className="py-3 px-4 font-semibold">Effective Window</th>
                   <th className="py-3 px-4 font-semibold">Rates (EE / ER)</th>
-                  <th className="py-3 px-4 font-semibold">Ceiling (Per Party)</th>
+                  <th className="py-3 px-4 font-semibold">Earnings ceiling (monthly)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -218,7 +218,7 @@ export const RulesCalculatorPage: React.FC = () => {
                         {(r.employeeRate * 100).toFixed(2)}% / {(r.employerRate * 100).toFixed(2)}%
                       </td>
                       <td className="py-3.5 px-4 font-mono text-slate-900">
-                        {r.monthlyCeilingPerParty ? fmt(r.monthlyCeilingPerParty) : 'Uncapped'}
+                        {r.ceilingAmount != null ? fmt(r.ceilingAmount) : 'No ceiling'}
                       </td>
                     </tr>
                   ))
