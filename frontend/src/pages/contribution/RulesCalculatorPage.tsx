@@ -69,7 +69,7 @@ export const RulesCalculatorPage: React.FC = () => {
 
   const fmt = (val: number | null | undefined) =>
     val === null || val === undefined
-      ? '—'
+      ? 'â€”'
       : `ZMW ${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (
@@ -152,19 +152,19 @@ export const RulesCalculatorPage: React.FC = () => {
             <div className="mt-4 pt-4 border-t border-slate-200 space-y-2.5 text-sm">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Rule: {preview.ruleCode || `v${preview.ruleVersionId}`}</span>
+                <span>Rule: {preview.ruleCode || `v${preview.ruleVersionNo}`}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
                 <span className="text-slate-500">Employee (5%)</span>
-                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employeeContribution)}</span>
+                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employeeAmount)}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
                 <span className="text-slate-500">Employer (5%)</span>
-                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employerContribution)}</span>
+                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employerAmount)}</span>
               </div>
               <div className="flex justify-between py-1.5">
                 <span className="font-semibold text-slate-900">Total Expected</span>
-                <span className="font-mono font-bold text-blue-700">{fmt(preview.totalContribution)}</span>
+                <span className="font-mono font-bold text-blue-700">{fmt(preview.totalAmount)}</span>
               </div>
             </div>
           )}

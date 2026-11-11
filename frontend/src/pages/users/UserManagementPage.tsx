@@ -114,10 +114,11 @@ export const UserManagementPage: React.FC = () => {
     }
   };
 
-  const handleRoleChange = async (userId: number, newRole: RoleCode) => {
+  const handleRoleChange = async (user: AdminUser, newRole: RoleCode) => {
+    if (user.roleCode === newRole) return;
     try {
       setError(null);
-      await adminUsersApi.updateRole(userId, newRole);
+      await adminUsersApi.updateRole(user.userId, newRole);
       load();
     } catch (e: any) {
       setError(e.message || 'Failed to update user role.');
@@ -353,7 +354,7 @@ export const UserManagementPage: React.FC = () => {
                           ROLE_BADGE[u.roleCode] ?? 'bg-slate-100 text-slate-700 border-slate-200'
                         }`}
                         value={u.roleCode}
-                        onChange={(e) => handleRoleChange(u.userId, e.target.value as RoleCode)}
+                        onChange={(e) => handleRoleChange(u, e.target.value as RoleCode)}
                       >
                         {ROLES.map((r) => (
                           <option key={r} value={r} className="bg-white text-slate-900">

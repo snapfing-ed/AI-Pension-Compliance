@@ -2,7 +2,12 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
+
+const hmrDisabled = process.env.DISABLE_HMR === 'true';
+const websocketOptions: NonNullable<UserConfig['server']>['ws'] = hmrDisabled
+  ? false
+  : { host: 'localhost', protocol: 'ws', clientPort: 3000 };
 
 export default defineConfig(() => {
   return {
@@ -15,12 +20,14 @@ export default defineConfig(() => {
     },
 
     server: {
+      strictPort: true,
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
-      hmr: process.env.DISABLE_HMR !== 'true',
+      hmr: !hmrDisabled,
+      ws: websocketOptions,
 
       // Disable file watching when DISABLE_HMR is true.
-      watch: process.env.DISABLE_HMR === 'true' ? null : {},
+      watch: hmrDisabled ? null : {},
 
       // Forward frontend API requests to the Spring Boot backend.
       proxy: {

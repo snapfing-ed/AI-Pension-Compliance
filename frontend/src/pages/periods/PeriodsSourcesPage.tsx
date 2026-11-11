@@ -218,6 +218,9 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
               <label className="block text-xs font-medium text-slate-600 mb-1">Source Code</label>
               <input
                 required
+                maxLength={60}
+                pattern="[A-Za-z0-9][A-Za-z0-9_-]{0,59}"
+                title="Use 1–60 letters, numbers, underscores or hyphens; start with a letter or number."
                 className="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. SRC-PAYROLL-CSV"
                 value={sourceCode}
@@ -317,8 +320,8 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
                     <td className="py-3.5 px-4 font-semibold text-slate-900">
                       {p.periodLabel || `${p.periodYear}-${String(p.periodMonth).padStart(2, '0')}`}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.startDate}</td>
-                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.endDate}</td>
+                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.periodStart}</td>
+                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.periodEnd}</td>
                     <td className="py-3.5 px-4">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold border ${
@@ -393,7 +396,7 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
                   </td>
                 </tr>
               ) : (
-                sources.map((s: any) => (
+                sources.map((s) => (
                   <tr key={s.sourceId} className="hover:bg-slate-50/85 transition-colors">
                     <td className="py-3.5 px-4 font-mono font-semibold text-slate-900">{s.sourceCode}</td>
                     <td className="py-3.5 px-4 text-slate-700">{s.sourceName}</td>

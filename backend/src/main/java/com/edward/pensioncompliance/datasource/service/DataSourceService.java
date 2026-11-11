@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -32,6 +33,7 @@ public class DataSourceService {
 
     private static final int MAX_PAGE_SIZE = 100;
     private static final Pattern SOURCE_TYPE_PATTERN = Pattern.compile("^[A-Z][A-Z0-9_-]{0,39}$");
+    private static final Pattern SOURCE_CODE_PATTERN = Pattern.compile("^[A-Z0-9][A-Z0-9_-]{0,59}$");
 
     private final DataSourceRepository sources;
     private final AppUserRepository users;
@@ -92,11 +94,18 @@ public class DataSourceService {
     @PreAuthorize("hasRole('SYSTEM_ADMINISTRATOR')")
     @Transactional
     public DataSourceResponse create(CreateDataSourceRequest request, Authentication auth) {
+        String code = normalizeSourceCode(request.sourceCode());
+        if (sources.existsBySourceCodeIgnoreCase(code)) {
+            throw duplicateSourceCode();
+        }
         String name = request.sourceName().trim();
         String normalizedType = normalizeSourceType(request.sourceType());
         AppUser actor = resolveActor(auth);
 
-        DataSource saved = sources.save(new DataSource(
+        DataSource saved;
+        try {
+            saved = sources.saveAndFlush(new DataSource(
+                code,
                 name,
                 normalizedType,
                 blankToNull(request.ownerName()),
@@ -104,7 +113,10 @@ public class DataSourceService {
                 request.permittedPurpose().trim(),
                 request.receivedAt(),
                 blankToNull(request.coverageNotes())
-        ));
+            ));
+        } catch (DataIntegrityViolationException e) {
+            throw duplicateSourceCode();
+        }
         audit.record(actor, "DATA_SOURCE_CREATED", "DATA_SOURCE",
                 saved.getSourceId().toString(),
                 "Data source '" + name + "' (" + normalizedType + ") registered.");
@@ -141,6 +153,19 @@ public class DataSourceService {
                     "Source type must start with a letter and use only letters, digits, underscores or hyphens.");
         }
         return normalized;
+    }
+
+    private static String normalizeSourceCode(String raw) {
+        String normalized = raw.trim().toUpperCase(Locale.ROOT);
+        if (!SOURCE_CODE_PATTERN.matcher(normalized).matches()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Source code must start with a letter or digit and use only letters, digits, underscores or hyphens.");
+        }
+        return normalized;
+    }
+
+    private static ResponseStatusException duplicateSourceCode() {
+        return new ResponseStatusException(HttpStatus.CONFLICT, "Source code is already registered.");
     }
 
     private static String blankToNull(String s) {

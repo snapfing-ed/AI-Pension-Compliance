@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 
 public record DataSourceResponse(
         Long sourceId,
+        String sourceCode,
         String sourceName,
         String sourceType,
         String ownerName,
@@ -18,6 +19,7 @@ public record DataSourceResponse(
     public static DataSourceResponse from(DataSource ds) {
         return new DataSourceResponse(
                 ds.getSourceId(),
+                ds.getSourceCode(),
                 ds.getSourceName(),
                 ds.getSourceType(),
                 ds.getOwnerName(),

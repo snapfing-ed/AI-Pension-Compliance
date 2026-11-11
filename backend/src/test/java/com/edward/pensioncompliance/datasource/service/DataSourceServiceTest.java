@@ -48,6 +48,7 @@ class DataSourceServiceTest {
     void actorIsResolvable() {
         when(auth.getName()).thenReturn("admin");
         when(users.findByUsername("admin")).thenReturn(Optional.of(actor));
+        when(sources.existsBySourceCodeIgnoreCase(any())).thenReturn(false);
     }
 
     private static void assertStatus(Throwable t, HttpStatus expected) {
@@ -57,13 +58,14 @@ class DataSourceServiceTest {
 
     @Test
     void create_normalizesSyntheticType_defaultsReceivedAtAndActive_andAudits() {
-        when(sources.save(any(DataSource.class))).thenAnswer(inv -> {
+        when(sources.saveAndFlush(any(DataSource.class))).thenAnswer(inv -> {
             DataSource ds = inv.getArgument(0);
             ReflectionTestUtils.setField(ds, "sourceId", 5L);
             return ds;
         });
 
         DataSourceResponse r = service.create(new CreateDataSourceRequest(
+                "  src-payroll-01  ",
                 "  Synthetic Batch A  ",
                 " synthetic ",
                 "   ",
@@ -74,6 +76,7 @@ class DataSourceServiceTest {
         ), auth);
 
         assertThat(r.sourceId()).isEqualTo(5L);
+        assertThat(r.sourceCode()).isEqualTo("SRC-PAYROLL-01");
         assertThat(r.sourceName()).isEqualTo("Synthetic Batch A");
         assertThat(r.sourceType()).isEqualTo("SYNTHETIC");
         assertThat(r.ownerName()).isNull();
@@ -88,13 +91,14 @@ class DataSourceServiceTest {
     @Test
     void create_preservesExplicitReceivedAt() {
         OffsetDateTime received = OffsetDateTime.of(2026, 11, 1, 9, 30, 0, 0, ZoneOffset.UTC);
-        when(sources.save(any(DataSource.class))).thenAnswer(inv -> {
+        when(sources.saveAndFlush(any(DataSource.class))).thenAnswer(inv -> {
             DataSource ds = inv.getArgument(0);
             ReflectionTestUtils.setField(ds, "sourceId", 6L);
             return ds;
         });
 
         DataSourceResponse r = service.create(new CreateDataSourceRequest(
+                "PAYROLL-GENERATOR-1",
                 "Payroll Generator v1",
                 "SYNTHETIC",
                 "Edward Kasongo",
@@ -105,6 +109,7 @@ class DataSourceServiceTest {
         ), auth);
 
         assertThat(r.receivedAt()).isEqualTo(received);
+        assertThat(r.sourceCode()).isEqualTo("PAYROLL-GENERATOR-1");
         assertThat(r.ownerName()).isEqualTo("Edward Kasongo");
         assertThat(r.authorityReference()).isEqualTo("MU-CS-2026");
         assertThat(r.coverageNotes()).isEqualTo("12 months simulated");
@@ -113,10 +118,23 @@ class DataSourceServiceTest {
     @Test
     void create_invalidSourceTypeCharacters_isBadRequest() {
         assertThatThrownBy(() -> service.create(new CreateDataSourceRequest(
-                "Bad Source", "INVALID TYPE!", null, null, "Testing", null, null), auth))
+                "BAD-SOURCE", "Bad Source", "INVALID TYPE!", null, null, "Testing", null, null), auth))
                 .satisfies(t -> assertStatus(t, HttpStatus.BAD_REQUEST));
 
         verify(sources, never()).save(any());
+        verify(audit, never()).record(any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void create_duplicateSourceCode_isConflict_andNothingIsSavedOrAudited() {
+        when(sources.existsBySourceCodeIgnoreCase("SRC-PAYROLL-01")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.create(new CreateDataSourceRequest(
+                "src-payroll-01", "Payroll Export", "PAYROLL_EXPORT", null, null,
+                "Monthly compliance import", null, null), auth))
+                .satisfies(t -> assertStatus(t, HttpStatus.CONFLICT));
+
+        verify(sources, never()).saveAndFlush(any());
         verify(audit, never()).record(any(), any(), any(), any(), any());
     }
 

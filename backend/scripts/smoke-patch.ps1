@@ -38,9 +38,9 @@ $u1 = Invoke-Api $admin PATCH "/api/employers/$eid" @{ legalName = "Patch Test L
 Check "valid change -> 200 with the new value" ($u1.Code -eq 200 -and $u1.Json.legalName -eq "Patch Test Ltd 2") "status $($u1.Code)"
 Check "updatedAt moves forward" ((Dt $u1.Json.updatedAt) -gt (Dt $e.Json.updatedAt))
 
-$u2 = Invoke-Api $admin PATCH "/api/employers/$eid" @{ legalName = "Patch Test Ltd 2"; status = "ACTIVE" }
+$base = Invoke-Api $admin GET "/api/employers/$eid"; $u2 = Invoke-Api $admin PATCH "/api/employers/$eid" @{ legalName = "Patch Test Ltd 2"; status = "ACTIVE" }
 Check "no-op change -> 200" ($u2.Code -eq 200) "status $($u2.Code)"
-Check "no-op does not touch updatedAt (no false history)" ((Dt $u2.Json.updatedAt) -eq (Dt $u1.Json.updatedAt))
+$after2 = Invoke-Api $admin GET "/api/employers/$eid"; Check "no-op does not touch updatedAt (no false history)" ($after2.Json.updatedAt -eq $base.Json.updatedAt)
 
 $bad = Invoke-Api $admin PATCH "/api/employers/$eid" @{ status = "BANANA" }
 Check "invalid status -> 400 naming the field" ($bad.Code -eq 400 -and ($bad.Json.fields -contains "status")) "status $($bad.Code) $($bad.Text)"
@@ -198,7 +198,7 @@ if ($ae.Code -eq 200) {
     $types = @([regex]::Matches($ae.Text, '"eventType"\s*:\s*"([A-Z_]+)"') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
     if ($types.Count -gt 0) {
         Note ("event types present: " + ($types -join ", "))
-        foreach ($t in "EMPLOYER_UPDATED", "USER_STATUS_CHANGED", "USER_ROLE_CHANGED") {
+        foreach ($t in "EMPLOYER_UPDATED", "CONTRIBUTION_PERIOD_STATUS_CHANGED", "USER_STATUS_CHANGED", "USER_ROLE_CHANGED") {
             Check "audit trail contains $t" ($types -contains $t)
         }
     } else {

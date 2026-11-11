@@ -9,7 +9,8 @@ export interface PageResponse<T> {
 export interface Employer {
   employerId: number;
   employerRef: string;
-  employerName: string;
+  legalName: string;
+  tradingName?: string | null;
   status: string;
 }
 
@@ -31,32 +32,80 @@ export interface ContributionPeriod {
 
 export interface DataSource {
   sourceId: number;
+  sourceCode: string;
   sourceName: string;
   sourceType: string;
+  ownerName: string | null;
+  authorityReference: string | null;
   permittedPurpose: string;
+  receivedAt: string;
+  coverageNotes: string | null;
   status: string;
 }
 
 export interface PayrollBatch {
   payrollBatchId: number;
   employerId: number;
+  employerRef?: string;
+  employerLegalName: string;
   periodId: number;
+  periodLabel: string;
+  sourceId: number;
+  sourceName: string;
+  sourceType: string;
   batchRef: string;
   versionNo: number;
-  status: string;
+  receivedAt: string;
+  recordedAt: string;
+  status: 'RECEIVED' | 'VALIDATED' | 'REJECTED' | 'SUPERSEDED';
+  current: boolean;
   supersedesBatchId?: number | null;
+  supersededByBatchId?: number | null;
+  validRecordCount: number;
+  missingPayRecordCount: number;
+  totalRecordsStored: number;
+  quarantinedRecordCount: number;
 }
 
 export interface PayrollRecord {
   payrollRecordId: number;
   payrollBatchId: number;
+  employerId: number;
+  periodId: number;
   memberId: number;
-  memberRef?: string;
+  memberRef: string;
+  sourceMemberRef: string | null;
   sourceRowRef?: string;
   eligibleGrossPay: number | null;
   payrollStatus: string;
-  dataQualityStatus: string;
-  quarantineReason?: string | null;
+  dataQualityStatus: 'PENDING' | 'VALID' | 'ISSUE';
+}
+
+export interface PayrollQuarantineRecord {
+  quarantineRecordId: number;
+  payrollBatchId: number;
+  rowNumber: number;
+  sourceRowRef: string | null;
+  rawMemberRef: string | null;
+  rawSourceMemberRef: string | null;
+  rawEligibleGrossPay: string | null;
+  rawPayrollStatus: string | null;
+  reasonCode: string;
+  reasonDetail: string;
+  quarantinedAt: string;
+}
+
+export interface PayrollImportResponse {
+  batch: PayrollBatch;
+  totalRowsEvaluated: number;
+  validRecordCount: number;
+  missingPayRecordCount: number;
+  quarantinedRecordCount: number;
+  duplicateRowCount: number;
+  autoCreatedMemberCount: number;
+  processingTimeMs: number;
+  quarantinedRowsTruncated: boolean;
+  quarantinedRows: PayrollQuarantineRecord[];
 }
 
 export interface ContributionRule {
@@ -68,6 +117,9 @@ export interface ContributionRule {
   employeeRate: number;
   employerRate: number;
   ceilingAmount: number | null;
+  dueDayRule: string | null;
+  roundingRule: string | null;
+  sourceReference: string | null;
   verificationStatus: string;
 }
 
@@ -126,9 +178,9 @@ export const module2Api = {
     qs.set('size', String(params.size ?? 20));
     return apiFetch<PageResponse<Employer>>(`/api/employers?${qs}`);
   },
-  createEmployer: (body: { employerRef: string; employerName: string }) =>
+  createEmployer: (body: { employerRef: string; legalName: string; tradingName?: string }) =>
     apiFetch<Employer>('/api/employers', { method: 'POST', body: JSON.stringify(body) }),
-  updateEmployer: (id: number, body: { employerName?: string; status?: string }) =>
+  updateEmployer: (id: number, body: { legalName?: string; tradingName?: string; status?: string }) =>
     apiFetch<Employer>(`/api/employers/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
 
   listMembers: (params: { q?: string; page?: number; size?: number }) => {
@@ -141,28 +193,80 @@ export const module2Api = {
   createMember: (body: { memberRef: string }) =>
     apiFetch<Member>('/api/members', { method: 'POST', body: JSON.stringify(body) }),
 
-  listPeriods: () => apiFetch<ContributionPeriod[]>('/api/contribution-periods'),
+  listPeriods: async () => {
+    const result = await apiFetch<ContributionPeriod[] | PageResponse<ContributionPeriod>>(
+      '/api/contribution-periods?page=0&size=100',
+    );
+    return Array.isArray(result) ? result : result.content;
+  },
   createPeriod: (body: { periodYear: number; periodMonth: number }) =>
     apiFetch<ContributionPeriod>('/api/contribution-periods', { method: 'POST', body: JSON.stringify(body) }),
   updatePeriodStatus: (id: number, status: string) =>
     apiFetch<ContributionPeriod>(`/api/contribution-periods/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
 
-  listDataSources: () => apiFetch<DataSource[]>('/api/data-sources'),
-  createDataSource: (body: { sourceName: string; sourceType: string; permittedPurpose: string }) =>
+  listDataSources: async () => {
+    const result = await apiFetch<DataSource[] | PageResponse<DataSource>>(
+      '/api/data-sources?page=0&size=100',
+    );
+    return Array.isArray(result) ? result : result.content;
+  },
+  createDataSource: (body: { sourceCode: string; sourceName: string; sourceType: string; permittedPurpose: string }) =>
     apiFetch<DataSource>('/api/data-sources', { method: 'POST', body: JSON.stringify(body) }),
 
-  listBatches: (params: { employerId?: number; periodId?: number }) => {
+  listBatches: (params: { page?: number; size?: number; employerId?: number; periodId?: number }) => {
     const qs = new URLSearchParams();
+    qs.set('page', String(params.page ?? 0));
+    qs.set('size', String(params.size ?? 20));
     if (params.employerId) qs.set('employerId', String(params.employerId));
     if (params.periodId) qs.set('periodId', String(params.periodId));
     return apiFetch<PageResponse<PayrollBatch>>(`/api/payroll/batches?${qs}`);
   },
-  getBatchRecords: (batchId: number) =>
-    apiFetch<PageResponse<PayrollRecord>>(`/api/payroll/batches/${batchId}/records`),
-  importBatch: (body: any) =>
-    apiFetch<PayrollBatch>('/api/payroll/batches/import', { method: 'POST', body: JSON.stringify(body) }),
+  listBatchRecords: (batchId: number, params: { page?: number; size?: number }) => {
+    const qs = new URLSearchParams();
+    qs.set('page', String(params.page ?? 0));
+    qs.set('size', String(params.size ?? 50));
+    return apiFetch<PageResponse<PayrollRecord>>(`/api/payroll/batches/${batchId}/records?${qs}`);
+  },
+  listBatchQuarantine: (batchId: number, params: { page?: number; size?: number } = {}) => {
+    const qs = new URLSearchParams();
+    qs.set('page', String(params.page ?? 0));
+    qs.set('size', String(params.size ?? 50));
+    return apiFetch<PageResponse<PayrollQuarantineRecord>>(`/api/payroll/batches/${batchId}/quarantine?${qs}`);
+  },
+  importPayrollCsv: async (input: {
+    employerId: number;
+    periodId: number;
+    sourceId: number;
+    batchRef: string;
+    file: File;
+    supersedesBatchId?: number;
+  }) => {
+    const body = new FormData();
+    body.append('employerId', String(input.employerId));
+    body.append('periodId', String(input.periodId));
+    body.append('sourceId', String(input.sourceId));
+    body.append('batchRef', input.batchRef);
+    if (input.supersedesBatchId) body.append('supersedesBatchId', String(input.supersedesBatchId));
+    body.append('file', input.file);
+    const headers = await getCsrfHeader();
+    const res = await fetch('/api/payroll/batches/import-csv', {
+      method: 'POST',
+      body,
+      credentials: 'include',
+      headers,
+    });
+    if (!res.ok) {
+      let message = `Request failed (${res.status})`;
+      try {
+        const error = await res.json();
+        message = error.message || error.error || message;
+      } catch { /* ignore non-JSON error bodies */ }
+      throw new Error(message);
+    }
+    return res.json() as Promise<PayrollImportResponse>;
+  },
 
   listRules: () => apiFetch<ContributionRule[]>('/api/contribution-rules'),
-  previewCalculation: (body: any) =>
+  previewCalculation: (body: { grossPay: number; periodId: number }) =>
     apiFetch<CalculationPreviewResponse>('/api/contribution-calculations/preview', { method: 'POST', body: JSON.stringify(body) }),
 };

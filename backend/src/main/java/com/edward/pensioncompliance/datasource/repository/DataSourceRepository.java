@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface DataSourceRepository
         extends JpaRepository<DataSource, Long>, JpaSpecificationExecutor<DataSource> {
+    boolean existsBySourceCodeIgnoreCase(String sourceCode);
 }
