@@ -19,4 +19,6 @@ public interface PayrollRecordRepository
         GROUP BY r.payrollBatch.payrollBatchId, r.dataQualityStatus
         """)
     List<Object[]> countByBatchIdsAndQualityStatus(@Param("batchIds") Collection<Long> batchIds);
+
+    List<PayrollRecord> findByPayrollBatchPayrollBatchId(Long payrollBatchId);
 }

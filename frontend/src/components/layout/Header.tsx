@@ -1,45 +1,35 @@
-import React, { useState } from 'react';
-import { Play, Bell, CheckCircle2, LogOut } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
+import React from 'react';
+import { ShieldCheck, LogOut } from 'lucide-react';
+import { useApp, TabKey } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 
 export const Header: React.FC = () => {
-  const { activeTab, setActiveTab, runComplianceChecks, alerts } = useApp();
+  const { activeTab, setActiveTab } = useApp();
   const { currentUser, logout } = useAuth();
-  const [isRunning, setIsRunning] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const unreadAlerts = alerts.filter((a) => !a.read).length;
   const isAdmin = currentUser?.role === 'SYSTEM_ADMINISTRATOR';
+  const displayName =
+    currentUser?.displayName || currentUser?.name || currentUser?.username || 'User';
+  const displayEmail =
+    currentUser?.institutionalEmail || currentUser?.email || '';
 
   const roleLabel =
-    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'System Administrator Role' :
-    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'Compliance Supervisor Role' :
-    'Compliance Monitor Role';
+    currentUser?.role === 'SYSTEM_ADMINISTRATOR'
+      ? 'System Administrator Role'
+      : currentUser?.role === 'COMPLIANCE_SUPERVISOR'
+      ? 'Compliance Supervisor Role'
+      : 'Compliance Monitor Role';
 
   const avatarLabel =
-    currentUser?.role === 'SYSTEM_ADMINISTRATOR' ? 'System Admin' :
-    currentUser?.role === 'COMPLIANCE_SUPERVISOR' ? 'Supervisor' :
-    'Compliance Monitor';
+    currentUser?.role === 'SYSTEM_ADMINISTRATOR'
+      ? 'System Admin'
+      : currentUser?.role === 'COMPLIANCE_SUPERVISOR'
+      ? 'Supervisor'
+      : 'Compliance Monitor';
 
   const sectionLabel = isAdmin ? 'Administration' : 'Monitoring Operations';
 
-  const displayName = currentUser?.displayName || (currentUser as any)?.name || currentUser?.username || 'User';
-  const displayEmail = currentUser?.institutionalEmail || (currentUser as any)?.email || '';
-
-  const handleRunChecks = () => {
-    setIsRunning(true);
-    setTimeout(() => {
-      const result = runComplianceChecks();
-      setIsRunning(false);
-      setToastMessage(
-        `Checked ${result.recordsEvaluated} records in ${result.durationMs}ms: Found ${result.exceptionsDetected} exceptions.`
-      );
-      setTimeout(() => setToastMessage(null), 4000);
-    }, 400);
-  };
-
-  const titles: Record<string, string> = {
+  const titles: Record<TabKey, string> = {
     'admin-overview': 'System Administration Console',
     overview: 'Compliance Monitoring Dashboard',
     users: 'User Accounts & Access Control',
@@ -47,29 +37,22 @@ export const Header: React.FC = () => {
     members: 'Registered Members Directory',
     periods: 'Contribution Periods & Data Sources',
     payroll: 'Payroll Batches & Records',
-    rules: 'Contribution Rules & Calculator',
-    contributions: 'Contribution Reconciliation Ledger',
-    compliance: 'Compliance Monitoring Engine',
-    'ai-risk': 'AI Anomaly Analysis & Explainability',
+    'returns-payments': 'Returns, Payments & Completeness Ledger',
+    compliance: 'Compliance Analysis & Findings',
     cases: 'Investigation Case Management',
-    alerts: 'Compliance Alerts & Notifications',
-    reports: 'Compliance Reports & Analytics',
-    import: 'Contribution Data Import & Validation',
-    evaluation: 'Model Evaluation & System Performance',
-    audit: 'Security & Activity Audit Logs',
-    settings: 'System Configuration & Thresholds',
+    rules: 'Contribution Rules & Calculator',
   };
 
   const initials = displayName
     .split(' ')
-    .map((n: string) => n[0])
+    .filter(Boolean)
+    .map((n) => n[0])
     .join('')
     .slice(0, 2)
     .toUpperCase();
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between gap-4 sticky top-0 z-20">
-      {/* Zone 1: Breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
         <div>
           <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
@@ -82,7 +65,7 @@ export const Header: React.FC = () => {
           <div className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5 flex-wrap">
             {displayEmail && (
               <>
-                <span className="font-semibold text-slate-700 truncate max-w-[160px] sm:max-w-none">
+                <span className="font-semibold text-slate-700 truncate max-w-[180px] sm:max-w-none">
                   {displayEmail}
                 </span>
                 <span aria-hidden="true" className="hidden sm:inline">·</span>
@@ -95,37 +78,14 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Zone 2: Toast */}
-      {toastMessage && (
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 text-xs font-medium">
-          <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* Zone 3: Actions */}
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <button
-          onClick={handleRunChecks}
-          disabled={isRunning}
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-medium transition-colors disabled:opacity-50 shadow-sm"
-          aria-label="Execute deterministic compliance rules on active records"
-          title="Execute deterministic compliance rules on active records"
+          onClick={() => setActiveTab('compliance')}
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded text-xs font-medium transition-colors shadow-sm"
+          title="Open Compliance Analysis & Findings"
         >
-          <Play className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} />
-          <span>{isRunning ? 'Running...' : 'Run Checks'}</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('alerts')}
-          className="relative p-2 rounded-md hover:bg-slate-100 text-slate-600 transition-colors"
-          aria-label={`View alerts${unreadAlerts > 0 ? `, ${unreadAlerts} unread` : ''}`}
-          title="View Alerts"
-        >
-          <Bell className="w-4 h-4" />
-          {unreadAlerts > 0 && (
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-500" />
-          )}
+          <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+          <span>Analysis Console</span>
         </button>
 
         <div className="h-6 w-px bg-slate-200 mx-1 hidden sm:block" />

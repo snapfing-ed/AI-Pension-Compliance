@@ -6,9 +6,11 @@ import {
   Calendar,
   FileSpreadsheet,
   Calculator,
+  Receipt,
+  ShieldCheck,
+  Briefcase,
   UserCog,
   ChevronRight,
-  ChevronLeft,
   LogOut,
   ShieldAlert,
   PanelLeftClose,
@@ -37,22 +39,28 @@ export const Sidebar: React.FC = () => {
     'Compliance Operations';
 
   const adminNavItems: Array<{ key: TabKey; label: string; icon: React.ElementType }> = [
-    { key: 'admin-overview', label: 'Administration Console', icon: ShieldAlert },
-    { key: 'users',          label: 'User & Role Management', icon: UserCog },
-    { key: 'employers',      label: 'Employers Directory',    icon: Building2 },
-    { key: 'members',        label: 'Members Directory',      icon: Users },
-    { key: 'periods',        label: 'Periods & Data Sources', icon: Calendar },
-    { key: 'payroll',        label: 'Payroll Batches',        icon: FileSpreadsheet },
-    { key: 'rules',          label: 'Rules & Calculator',     icon: Calculator },
+    { key: 'admin-overview',   label: 'Administration Console', icon: ShieldAlert },
+    { key: 'users',            label: 'User & Role Management', icon: UserCog },
+    { key: 'employers',        label: 'Employers Directory',    icon: Building2 },
+    { key: 'members',          label: 'Members Directory',      icon: Users },
+    { key: 'periods',          label: 'Periods & Data Sources', icon: Calendar },
+    { key: 'payroll',          label: 'Payroll Batches',        icon: FileSpreadsheet },
+    { key: 'returns-payments', label: 'Returns & Payments',     icon: Receipt },
+    { key: 'compliance',       label: 'Analysis & Findings',    icon: ShieldCheck },
+    { key: 'cases',            label: 'Investigation Cases',    icon: Briefcase },
+    { key: 'rules',            label: 'Rules & Calculator',     icon: Calculator },
   ];
 
   const operationalNavItems: Array<{ key: TabKey; label: string; icon: React.ElementType }> = [
-    { key: 'overview',  label: 'Overview Dashboard',     icon: LayoutDashboard },
-    { key: 'employers', label: 'Employers Directory',    icon: Building2 },
-    { key: 'members',   label: 'Members Directory',      icon: Users },
-    { key: 'periods',   label: 'Periods & Data Sources', icon: Calendar },
-    { key: 'payroll',   label: 'Payroll Batches',        icon: FileSpreadsheet },
-    { key: 'rules',     label: 'Rules & Calculator',     icon: Calculator },
+    { key: 'overview',         label: 'Overview Dashboard',     icon: LayoutDashboard },
+    { key: 'employers',        label: 'Employers Directory',    icon: Building2 },
+    { key: 'members',          label: 'Members Directory',      icon: Users },
+    { key: 'periods',          label: 'Periods & Data Sources', icon: Calendar },
+    { key: 'payroll',          label: 'Payroll Batches',        icon: FileSpreadsheet },
+    { key: 'returns-payments', label: 'Returns & Payments',     icon: Receipt },
+    { key: 'compliance',       label: 'Analysis & Findings',    icon: ShieldCheck },
+    { key: 'cases',            label: 'Investigation Cases',    icon: Briefcase },
+    { key: 'rules',            label: 'Rules & Calculator',     icon: Calculator },
   ];
 
   const navItems = isAdmin ? adminNavItems : operationalNavItems;
@@ -69,7 +77,6 @@ export const Sidebar: React.FC = () => {
       } bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 min-h-screen select-none transition-all duration-200`}
       aria-label="Application navigation"
     >
-      {/* Brand + Collapse Toggle */}
       <div className="px-4 py-5 border-b border-slate-800 flex items-center justify-between gap-2">
         <div className={`flex items-center gap-3 overflow-hidden ${collapsed ? 'justify-center w-full' : ''}`}>
           <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm bg-blue-600 shrink-0">
@@ -109,7 +116,6 @@ export const Sidebar: React.FC = () => {
         </div>
       )}
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto" aria-label="Main menu">
         {!collapsed && (
           <div className="px-3 pb-1 text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
@@ -143,7 +149,6 @@ export const Sidebar: React.FC = () => {
         })}
       </nav>
 
-      {/* Session footer */}
       <div className="p-3 border-t border-slate-800 bg-slate-950/60 space-y-2">
         {!collapsed && (
           <>
@@ -166,8 +171,7 @@ export const Sidebar: React.FC = () => {
         <button
           onClick={() => void logout()}
           title={collapsed ? 'Sign Out' : undefined}
-          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 mt-1 bg-slate-800 hover:bg-rose-950 hover:text-rose-200 text-slate-300 rounded text-xs font-semibold transition-colors border border-slate-700/80 focus:outline-none focus:ring-2 focus:ring-rose-500"
-          aria-label="Sign out of session"
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 mt-1 bg-slate-800 hover:bg-rose-950 hover:text-rose-200 text-slate-300 rounded text-xs font-semibold transition-colors border border-slate-700/80"
         >
           <LogOut className="w-3.5 h-3.5 shrink-0" />
           {!collapsed && <span>Sign Out</span>}

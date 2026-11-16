@@ -157,7 +157,7 @@ export const AdminDashboardPage: React.FC = () => {
             Welcome back, {currentUser?.displayName || currentUser?.username || 'Administrator'}
           </h1>
           <p className="text-slate-300 text-sm mt-1">
-            SmartCompliance Decision-Support Platform Ã¢â‚¬â€ Overview &amp; Operational Controls
+            SmartCompliance Decision-Support Platform — Overview &amp; Operational Controls
           </p>
         </div>
         <div className="flex items-center gap-3 bg-slate-800/80 border border-slate-700 rounded-lg px-4 py-2.5 text-sm">
@@ -186,7 +186,7 @@ export const AdminDashboardPage: React.FC = () => {
                 </div>
               </div>
               <div className="text-3xl font-bold text-slate-900">
-                {loading ? 'Ã¢â‚¬â€' : card.value.toLocaleString()}
+                {loading ? '—' : card.value.toLocaleString()}
               </div>
               <div className="text-xs text-slate-500 mt-1 flex items-center justify-between">
                 <span>{card.sub}</span>
@@ -229,11 +229,11 @@ export const AdminDashboardPage: React.FC = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">Contribution Periods</span>
-                <span className="font-semibold text-slate-900">{loading ? 'Ã¢â‚¬â€' : stats.totalPeriods}</span>
+                <span className="font-semibold text-slate-900">{loading ? '—' : stats.totalPeriods}</span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">Seeded Rule Versions</span>
-                <span className="font-semibold text-slate-900">{loading ? 'Ã¢â‚¬â€' : stats.totalRules}</span>
+                <span className="font-semibold text-slate-900">{loading ? '—' : stats.totalRules}</span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-slate-100">
                 <span className="text-slate-500">Session Security</span>

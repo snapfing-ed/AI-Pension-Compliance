@@ -13,6 +13,9 @@ import { MembersPage } from './pages/members/MembersPage';
 import { PeriodsSourcesPage } from './pages/periods/PeriodsSourcesPage';
 import { PayrollPage } from './pages/payroll/PayrollPage';
 import { RulesCalculatorPage } from './pages/contribution/RulesCalculatorPage';
+import { ReturnsPaymentsPage } from './pages/compliance/ReturnsPaymentsPage';
+import { AnalysisFindingsPage } from './pages/compliance/AnalysisFindingsPage';
+import { InvestigationCasesPage } from './pages/cases/InvestigationCasesPage';
 
 const AuthenticatedApp: React.FC = () => {
   const { activeTab } = useApp();
@@ -24,13 +27,16 @@ const AuthenticatedApp: React.FC = () => {
       case 'admin-overview':
       case 'overview':
         return <AdminDashboardPage />;
-      case 'users':        return <UserManagementPage />;
-      case 'employers':    return <EmployersPage isAdmin={isAdmin} />;
-      case 'members':      return <MembersPage isAdmin={isAdmin} />;
-      case 'periods':      return <PeriodsSourcesPage isAdmin={isAdmin} />;
-      case 'payroll':      return <PayrollPage isAdmin={isAdmin} />;
-      case 'rules':        return <RulesCalculatorPage />;
-      default:             return <AdminDashboardPage />;
+      case 'users':            return <UserManagementPage />;
+      case 'employers':        return <EmployersPage isAdmin={isAdmin} />;
+      case 'members':          return <MembersPage isAdmin={isAdmin} />;
+      case 'periods':          return <PeriodsSourcesPage isAdmin={isAdmin} />;
+      case 'payroll':          return <PayrollPage isAdmin={isAdmin} />;
+      case 'returns-payments': return <ReturnsPaymentsPage isAdmin={isAdmin} />;
+      case 'compliance':       return <AnalysisFindingsPage />;
+      case 'cases':            return <InvestigationCasesPage />;
+      case 'rules':            return <RulesCalculatorPage />;
+      default:                 return <AdminDashboardPage />;
     }
   };
 

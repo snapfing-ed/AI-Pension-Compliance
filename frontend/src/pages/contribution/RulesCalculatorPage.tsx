@@ -69,7 +69,7 @@ export const RulesCalculatorPage: React.FC = () => {
 
   const fmt = (val: number | null | undefined) =>
     val === null || val === undefined
-      ? 'â€”'
+      ? '—'
       : `ZMW ${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   return (

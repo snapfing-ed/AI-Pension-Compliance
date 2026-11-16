@@ -8,7 +8,7 @@ interface AuthVisualPanelProps {
 export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login' }) => {
   const headline =
     mode === 'login'
-      ? 'Pension contribution compliance monitoring for Zambia.'
+      ? 'AI-Based Pension contribution compliance monitoring for Zambia.'
       : 'Controlled access provisioning.';
 
   return (
