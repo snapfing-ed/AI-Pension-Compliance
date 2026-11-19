@@ -1,6 +1,8 @@
 package com.edward.pensioncompliance.analysis.service;
 
 import com.edward.pensioncompliance.analysis.dto.ExecuteAnalysisRequest;
+import com.edward.pensioncompliance.analysis.dto.FindingDraft;
+import com.edward.pensioncompliance.analysis.dto.RuleInputs;
 import com.edward.pensioncompliance.analysis.dto.SnapshotDetailResponse;
 import com.edward.pensioncompliance.analysis.entity.*;
 import com.edward.pensioncompliance.analysis.repository.*;
@@ -41,7 +43,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.OffsetDateTime;
@@ -73,6 +74,7 @@ public class AnalysisExecutionService {
     private final AuditService audit;
     private final EntityManager em;
     private final ContributionCalculator calculator = new ContributionCalculator();
+    private final DeterministicRuleEvaluator ruleEvaluator = new DeterministicRuleEvaluator();
 
     public AnalysisExecutionService(
             EmployerMonthAnalysisRepository analyses, AnalysisSnapshotRepository snapshots,
@@ -250,8 +252,12 @@ public class AnalysisExecutionService {
                     .executeUpdate();
         }
 
-        emitDeterministicFindings(snapshot, req.employerId(), req.periodId(),
-                activeBatches, latestReturns, scopeAssessments, totalExpected, totalReported, totalPaid, reportedUnknown);
+        boolean scopeEvidenceIncomplete = scopeAssessments.stream().anyMatch(a ->
+                a.getAssessmentStatus() == AssessmentStatus.INCOMPLETE
+                        || a.getAssessmentStatus() == AssessmentStatus.UNKNOWN);
+        emitDeterministicFindings(snapshot, new RuleInputs(
+                req.employerId(), req.periodId(), activeBatches.size(), latestReturns.size(),
+                reportedUnknown, scopeEvidenceIncomplete, totalExpected, totalReported, totalPaid));
 
         audit.record(actor, "ANALYSIS_EXECUTED", "ANALYSIS_SNAPSHOT", snapshot.getSnapshotId().toString(),
                 "Executed analysisId=" + analysis.getAnalysisId() + " run=" + nextRun + " result=" + overall);
@@ -262,88 +268,11 @@ public class AnalysisExecutionService {
         );
     }
 
-    private void emitDeterministicFindings(
-            AnalysisSnapshot snapshot,
-            Long employerId,
-            Long periodId,
-            List<PayrollBatch> activeBatches,
-            List<ReturnVersion> latestReturns,
-            List<CompletenessAssessment> scopeAssessments,
-            BigDecimal totalExpected,
-            BigDecimal totalReported,
-            BigDecimal totalPaid,
-            boolean reportedUnknown) {
-
-        Long sid = snapshot.getSnapshotId();
-
-        if (activeBatches.isEmpty()) {
+    private void emitDeterministicFindings(AnalysisSnapshot snapshot, RuleInputs inputs) {
+        for (FindingDraft d : ruleEvaluator.evaluate(inputs)) {
             complianceFindings.save(new ComplianceFinding(
-                    sid, "RULE_MISSING_PAYROLL_BATCH", "POTENTIALLY_MISSING",
-                    "No validated payroll batch found for employer #" + employerId + " in period #" + periodId + ".",
-                    new BigDecimal("85.000"), new BigDecimal("0.98000"), "RULE",
-                    "Deterministic rule check detected zero VALIDATED payroll batches in scope."
-            ));
-        }
-
-        if (latestReturns.isEmpty() && !activeBatches.isEmpty()) {
-            complianceFindings.save(new ComplianceFinding(
-                    sid, "RULE_MISSING_CONTRIBUTION_RETURN", "POTENTIALLY_MISSING",
-                    "Validated payroll exists (" + totalExpected + " ZMW expected) but no contribution return was submitted.",
-                    new BigDecimal("90.000"), new BigDecimal("0.99000"), "RULE",
-                    "Expected statutory contribution is " + totalExpected + " ZMW with 0 submitted return versions."
-            ));
-        }
-
-        if (scopeAssessments.stream().anyMatch(a ->
-                a.getAssessmentStatus() == AssessmentStatus.INCOMPLETE || a.getAssessmentStatus() == AssessmentStatus.UNKNOWN)) {
-            complianceFindings.save(new ComplianceFinding(
-                    sid, "RULE_INCOMPLETE_SCOPE_EVIDENCE", "POTENTIALLY_INCOMPLETE",
-                    "One or more completeness assessments in scope are marked INCOMPLETE or UNKNOWN.",
-                    new BigDecimal("72.500"), new BigDecimal("0.95000"), "RULE",
-                    "Scope evidence completeness check flagged non-COMPLETE assessment records."
-            ));
-        }
-
-        if (!activeBatches.isEmpty() && !latestReturns.isEmpty() && !reportedUnknown && totalReported.compareTo(totalExpected) < 0) {
-            BigDecimal shortfall = totalExpected.subtract(totalReported);
-            BigDecimal score = BigDecimal.valueOf(55.0).add(shortfall.divide(BigDecimal.valueOf(500), 3, RoundingMode.HALF_UP))
-                    .min(new BigDecimal("100.000"));
-            complianceFindings.save(new ComplianceFinding(
-                    sid, "RULE_UNDER_REPORTED_CONTRIBUTION", "POTENTIALLY_INCOMPLETE",
-                    "Reported contribution (" + totalReported + " ZMW) is below statutory expected (" + totalExpected + " ZMW) by " + shortfall + " ZMW.",
-                    score, new BigDecimal("0.99000"), "RULE",
-                    "Expected=" + totalExpected + " ZMW vs Reported=" + totalReported + " ZMW (variance=" + shortfall + " ZMW)."
-            ));
-        }
-
-        if (reportedUnknown) {
-            complianceFindings.save(new ComplianceFinding(
-                    sid, "RULE_RETURN_AMOUNT_MISSING", "POTENTIALLY_INCOMPLETE",
-                    "A submitted return version has no reported total amount, so reported contribution cannot be compared with expected.",
-                    new BigDecimal("70.000"), new BigDecimal("0.95000"), "RULE",
-                    "Reported total is NULL (not reported); it is treated as unknown, not zero."
-            ));
-        }
-
-        if (!activeBatches.isEmpty() && totalPaid.compareTo(totalExpected) < 0) {
-            BigDecimal unpaid = totalExpected.subtract(totalPaid);
-            BigDecimal score = BigDecimal.valueOf(60.0).add(unpaid.divide(BigDecimal.valueOf(500), 3, RoundingMode.HALF_UP))
-                    .min(new BigDecimal("100.000"));
-            complianceFindings.save(new ComplianceFinding(
-                    sid, "RULE_UNREMITTED_CONTRIBUTION_SHORTFALL", "POTENTIALLY_DELAYED",
-                    "Allocated confirmed payments (" + totalPaid + " ZMW) fall short of expected (" + totalExpected + " ZMW) by " + unpaid + " ZMW.",
-                    score, new BigDecimal("0.99000"), "RULE",
-                    "Expected=" + totalExpected + " ZMW vs Allocated Payments=" + totalPaid + " ZMW (shortfall=" + unpaid + " ZMW)."
-            ));
-        }
-
-        if (!activeBatches.isEmpty() && (totalReported.compareTo(totalExpected) > 0 || totalPaid.compareTo(totalExpected) > 0)) {
-            complianceFindings.save(new ComplianceFinding(
-                    sid, "RULE_POSITIVE_CONTRIBUTION_VARIANCE", "UNUSUAL_PATTERN",
-                    "Reported (" + totalReported + " ZMW) or paid (" + totalPaid + " ZMW) exceeds statutory expected (" + totalExpected + " ZMW).",
-                    new BigDecimal("50.000"), new BigDecimal("0.92000"), "RULE",
-                    "Positive variance detected between expected (" + totalExpected + "), reported (" + totalReported + "), and paid (" + totalPaid + ")."
-            ));
+                    snapshot.getSnapshotId(), d.findingCode(), d.category(), d.description(),
+                    d.priorityScore(), d.confidenceScore(), d.detectionMethod(), d.explanation()));
         }
     }
 
