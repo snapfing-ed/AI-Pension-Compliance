@@ -75,6 +75,30 @@ public class DeterministicRuleEvaluator {
                     "Expected=" + expected + " ZMW vs Allocated Payments=" + paid + " ZMW (shortfall=" + unpaid + " ZMW)."));
         }
 
+        if (in.maxReturnDaysLate() > 0) {
+            BigDecimal score = BigDecimal.valueOf(55.0)
+                    .add(BigDecimal.valueOf(in.maxReturnDaysLate() * 1.5))
+                    .setScale(3, RoundingMode.HALF_UP)
+                    .min(new BigDecimal("100.000"));
+            out.add(new FindingDraft(
+                    "RULE_LATE_RETURN_SUBMISSION", "POTENTIALLY_DELAYED",
+                    "Contribution return was submitted " + in.maxReturnDaysLate() + " day(s) after the statutory due date.",
+                    score, new BigDecimal("0.99000"), "RULE",
+                    "Return submitted_at local date (Africa/Lusaka) exceeded period due date by " + in.maxReturnDaysLate() + " day(s)."));
+        }
+
+        if (in.maxPaymentDaysLate() > 0) {
+            BigDecimal score = BigDecimal.valueOf(55.0)
+                    .add(BigDecimal.valueOf(in.maxPaymentDaysLate() * 1.5))
+                    .setScale(3, RoundingMode.HALF_UP)
+                    .min(new BigDecimal("100.000"));
+            out.add(new FindingDraft(
+                    "RULE_LATE_PAYMENT", "POTENTIALLY_DELAYED",
+                    "Allocated contribution payment was settled " + in.maxPaymentDaysLate() + " day(s) after the statutory due date.",
+                    score, new BigDecimal("0.99000"), "RULE",
+                    "Payment paid_at local date (Africa/Lusaka) exceeded period due date by " + in.maxPaymentDaysLate() + " day(s)."));
+        }
+
         if (hasPayroll && (reported.compareTo(expected) > 0 || paid.compareTo(expected) > 0)) {
             out.add(new FindingDraft(
                     "RULE_POSITIVE_CONTRIBUTION_VARIANCE", "UNUSUAL_PATTERN",

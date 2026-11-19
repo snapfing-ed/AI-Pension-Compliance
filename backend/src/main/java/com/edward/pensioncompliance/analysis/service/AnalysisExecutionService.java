@@ -20,6 +20,7 @@ import com.edward.pensioncompliance.findings.entity.DataQualityFinding;
 import com.edward.pensioncompliance.findings.repository.ComplianceFindingRepository;
 import com.edward.pensioncompliance.findings.repository.DataQualityFindingRepository;
 import com.edward.pensioncompliance.payments.entity.PaymentAllocation;
+import com.edward.pensioncompliance.payments.entity.PaymentTransaction;
 import com.edward.pensioncompliance.payments.entity.PaymentAllocationStatus;
 import com.edward.pensioncompliance.payments.repository.PaymentAllocationRepository;
 import com.edward.pensioncompliance.payroll.entity.PayrollBatch;
@@ -45,8 +46,10 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.HexFormat;
 import java.util.List;
 
@@ -75,6 +78,7 @@ public class AnalysisExecutionService {
     private final EntityManager em;
     private final ContributionCalculator calculator = new ContributionCalculator();
     private final DeterministicRuleEvaluator ruleEvaluator = new DeterministicRuleEvaluator();
+    private final DueDateCalculator dueDateCalculator = new DueDateCalculator();
 
     public AnalysisExecutionService(
             EmployerMonthAnalysisRepository analyses, AnalysisSnapshotRepository snapshots,
@@ -252,12 +256,36 @@ public class AnalysisExecutionService {
                     .executeUpdate();
         }
 
+        LocalDate dueDate = dueDateCalculator.resolveDueDate(
+                period, ruleEntity.getDueDayRule(), DueDateCalculator.WeekendAdjustment.NEXT_BUSINESS_DAY);
+
+        int maxReturnDaysLate = latestReturns.stream()
+                .map(ReturnVersion::getSubmittedAt)
+                .filter(java.util.Objects::nonNull)
+                .map(ts -> ts.atZoneSameInstant(DueDateCalculator.ZAMBIA_ZONE).toLocalDate())
+                .filter(d -> d.isAfter(dueDate))
+                .mapToInt(d -> (int) ChronoUnit.DAYS.between(dueDate, d))
+                .max()
+                .orElse(0);
+
+        int maxPaymentDaysLate = activeAllocations.stream()
+                .map(pa -> em.find(PaymentTransaction.class, pa.getPaymentId()))
+                .filter(java.util.Objects::nonNull)
+                .map(PaymentTransaction::getPaidAt)
+                .filter(java.util.Objects::nonNull)
+                .map(ts -> ts.atZoneSameInstant(DueDateCalculator.ZAMBIA_ZONE).toLocalDate())
+                .filter(d -> d.isAfter(dueDate))
+                .mapToInt(d -> (int) ChronoUnit.DAYS.between(dueDate, d))
+                .max()
+                .orElse(0);
+
         boolean scopeEvidenceIncomplete = scopeAssessments.stream().anyMatch(a ->
                 a.getAssessmentStatus() == AssessmentStatus.INCOMPLETE
                         || a.getAssessmentStatus() == AssessmentStatus.UNKNOWN);
         emitDeterministicFindings(snapshot, new RuleInputs(
                 req.employerId(), req.periodId(), activeBatches.size(), latestReturns.size(),
-                reportedUnknown, scopeEvidenceIncomplete, totalExpected, totalReported, totalPaid));
+                reportedUnknown, scopeEvidenceIncomplete, totalExpected, totalReported, totalPaid,
+                maxReturnDaysLate, maxPaymentDaysLate));
 
         audit.record(actor, "ANALYSIS_EXECUTED", "ANALYSIS_SNAPSHOT", snapshot.getSnapshotId().toString(),
                 "Executed analysisId=" + analysis.getAnalysisId() + " run=" + nextRun + " result=" + overall);

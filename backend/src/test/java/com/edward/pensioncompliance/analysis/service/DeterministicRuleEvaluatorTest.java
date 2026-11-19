@@ -16,7 +16,14 @@ class DeterministicRuleEvaluatorTest {
     private static RuleInputs in(int batches, int returns, boolean reportedUnknown, boolean scopeIncomplete,
                                  String expected, String reported, String paid) {
         return new RuleInputs(1L, 1L, batches, returns, reportedUnknown, scopeIncomplete,
-                new BigDecimal(expected), new BigDecimal(reported), new BigDecimal(paid));
+                new BigDecimal(expected), new BigDecimal(reported), new BigDecimal(paid), 0, 0);
+    }
+
+    private static RuleInputs inWithDelays(int batches, int returns, String expected, String reported, String paid,
+                                           int returnDaysLate, int paymentDaysLate) {
+        return new RuleInputs(1L, 1L, batches, returns, false, false,
+                new BigDecimal(expected), new BigDecimal(reported), new BigDecimal(paid),
+                returnDaysLate, paymentDaysLate);
     }
 
     private static List<String> codes(List<FindingDraft> drafts) {
@@ -45,7 +52,7 @@ class DeterministicRuleEvaluatorTest {
         List<FindingDraft> r = evaluator.evaluate(in(1, 1, false, false, "500.00", "350.00", "500.00"));
         assertThat(codes(r)).containsExactly("RULE_UNDER_REPORTED_CONTRIBUTION");
         assertThat(r.get(0).category()).isEqualTo("POTENTIALLY_INCOMPLETE");
-        assertThat(r.get(0).priorityScore()).isEqualByComparingTo("55.300");   // 55 + 150/500
+        assertThat(r.get(0).priorityScore()).isEqualByComparingTo("55.300");
     }
 
     @Test
@@ -67,7 +74,23 @@ class DeterministicRuleEvaluatorTest {
         List<FindingDraft> r = evaluator.evaluate(in(1, 1, false, false, "500.00", "500.00", "200.00"));
         assertThat(codes(r)).containsExactly("RULE_UNREMITTED_CONTRIBUTION_SHORTFALL");
         assertThat(r.get(0).category()).isEqualTo("POTENTIALLY_DELAYED");
-        assertThat(r.get(0).priorityScore()).isEqualByComparingTo("60.600");   // 60 + 300/500
+        assertThat(r.get(0).priorityScore()).isEqualByComparingTo("60.600");
+    }
+
+    @Test
+    void lateReturnAndLatePayment_producePotentiallyDelayedFindings() {
+        List<FindingDraft> r = evaluator.evaluate(inWithDelays(1, 1, "500.00", "500.00", "500.00", 4, 10));
+        assertThat(codes(r)).containsExactly("RULE_LATE_RETURN_SUBMISSION", "RULE_LATE_PAYMENT");
+        assertThat(r.get(0).category()).isEqualTo("POTENTIALLY_DELAYED");
+        assertThat(r.get(0).priorityScore()).isEqualByComparingTo("61.000"); // 55 + 4 * 1.5
+        assertThat(r.get(1).category()).isEqualTo("POTENTIALLY_DELAYED");
+        assertThat(r.get(1).priorityScore()).isEqualByComparingTo("70.000"); // 55 + 10 * 1.5
+    }
+
+    @Test
+    void lateScoreIsCappedAtOneHundred() {
+        List<FindingDraft> r = evaluator.evaluate(inWithDelays(1, 1, "500.00", "500.00", "500.00", 45, 0));
+        assertThat(r.get(0).priorityScore()).isEqualByComparingTo("100.000");
     }
 
     @Test
