@@ -153,7 +153,7 @@ export const ReturnsPaymentsPage: React.FC<Props> = ({ isAdmin }) => {
       <div className="bg-slate-900 text-white rounded-xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-mono uppercase tracking-wider text-blue-400 font-semibold">
-            Module 3A · Evidence &amp; Reconciliation Ledger
+            Reconciliation Ledger
           </span>
           <h1 className="text-xl font-bold mt-1">Returns, Payments &amp; Scope Completeness</h1>
           <p className="text-xs text-slate-300 mt-1">

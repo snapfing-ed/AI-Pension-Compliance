@@ -247,6 +247,8 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
                 <option value="PAYROLL_EXPORT">PAYROLL_EXPORT</option>
                 <option value="SYNTHETIC_GENERATOR">SYNTHETIC_GENERATOR</option>
                 <option value="MANUAL_ENTRY">MANUAL_ENTRY</option>
+                <option value="BANK">BANK</option>
+                <option value="RETURN_FILE">RETURN_FILE</option>
               </select>
             </div>
             <div>

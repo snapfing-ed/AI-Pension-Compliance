@@ -16,7 +16,7 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login'
 
       {/* Brand */}
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-[#365c50] border border-[#b0915b]/60 flex items-center justify-center text-white font-bold text-sm shrink-0">
           SC
         </div>
         <div>
@@ -27,6 +27,9 @@ export const AuthVisualPanel: React.FC<AuthVisualPanelProps> = ({ mode = 'login'
 
       {/* Central statement */}
       <div className="space-y-6">
+        <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c0a77d]">
+          Decision support · Zambia
+        </div>
         <h1 className="text-3xl xl:text-4xl font-bold text-white leading-snug max-w-xs">
           {headline}
         </h1>

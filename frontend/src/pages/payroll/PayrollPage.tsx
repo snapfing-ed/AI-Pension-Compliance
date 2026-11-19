@@ -58,6 +58,7 @@ export const PayrollPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   const [sourceId, setSourceId] = useState('');
   const [batchRef, setBatchRef] = useState('');
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvText, setCsvText] = useState('');
   const [importSubmitting, setImportSubmitting] = useState(false);
   const [importResult, setImportResult] = useState<PayrollImportResponse | null>(null);
 
@@ -122,23 +123,43 @@ export const PayrollPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
     }
   };
 
+  const handleFileChange = (file: File | null) => {
+    setCsvFile(file);
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result;
+      if (typeof content === 'string') {
+        setCsvText(content);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleImportCsv = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!employerId || !periodId || !sourceId || !batchRef.trim() || !csvFile) return;
+    const hasCsvPayload = Boolean(csvFile) || csvText.trim().length > 0;
+    if (!employerId || !periodId || !sourceId || !batchRef.trim() || !hasCsvPayload) return;
     try {
       setImportSubmitting(true);
       setError(null);
+      const uploadFile =
+        csvText.trim().length > 0
+          ? new File([csvText.trim()], csvFile?.name || `${batchRef.trim()}.csv`, { type: 'text/csv' })
+          : (csvFile as File);
+
       const result = await module2Api.importPayrollCsv({
         employerId: Number(employerId),
         periodId: Number(periodId),
         sourceId: Number(sourceId),
         batchRef: batchRef.trim(),
-        file: csvFile,
+        file: uploadFile,
         supersedesBatchId: supersedesBatchId ? Number(supersedesBatchId) : undefined,
       });
       setImportResult(result);
       setShowImportForm(false);
       setCsvFile(null);
+      setCsvText('');
       setSupersedesBatchId('');
       setSelectedBatch(null);
       setRecords([]);
@@ -162,6 +183,14 @@ export const PayrollPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
       </span>
     );
   };
+
+  const canSubmitImport =
+    !importSubmitting &&
+    !importOptionsLoading &&
+    employers.length > 0 &&
+    periods.length > 0 &&
+    sources.length > 0 &&
+    (Boolean(csvFile) || csvText.trim().length > 0);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -243,7 +272,7 @@ export const PayrollPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
           </div>
 
           {importOptionsLoading ? (
-            <p className="text-sm text-slate-500">Loading import options…</p>
+            <p className="text-sm text-slate-500">Loading import options...</p>
           ) : (
             <>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -298,10 +327,22 @@ export const PayrollPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
                   <input required maxLength={100} value={batchRef} onChange={(e) => setBatchRef(e.target.value)} disabled={Boolean(supersedesBatchId)} placeholder="e.g. PAYROLL-2026-11" className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm disabled:bg-slate-100" />
                 </label>
                 <label className="space-y-1 text-xs font-medium text-slate-600">
-                  <span>CSV file</span>
-                  <input required type="file" accept=".csv,text/csv" onChange={(e) => setCsvFile(e.target.files?.[0] ?? null)} className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                  <span>CSV file (optional if pasted below)</span>
+                  <input type="file" accept=".csv,text/csv" onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)} className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                 </label>
               </div>
+
+              <label className="block space-y-1 text-xs font-medium text-slate-600">
+                <span>Or paste CSV format text directly</span>
+                <textarea
+                  rows={8}
+                  value={csvText}
+                  onChange={(e) => setCsvText(e.target.value)}
+                  placeholder={"member_ref,eligible_gross_pay,source_row_ref\nMBR-ZM-5001,10000.00,ROW-001\nMBR-ZM-5002,12000.00,ROW-002"}
+                  className="w-full rounded-lg border border-slate-300 bg-slate-50 p-3 font-mono text-xs text-slate-900 focus:border-blue-500 focus:bg-white focus:outline-none"
+                />
+              </label>
+
               {(employers.length === 0 || periods.length === 0 || sources.length === 0) && (
                 <p className="text-sm text-amber-700">
                   Import needs an active employer, a non-archived period, and an active data source. Configure these in their management pages first.
@@ -309,8 +350,8 @@ export const PayrollPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
               )}
               <div className="flex justify-end gap-2">
                 <button type="button" onClick={() => setShowImportForm(false)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700">Cancel</button>
-                <button type="submit" disabled={importSubmitting || importOptionsLoading || !employers.length || !periods.length || !sources.length || !csvFile} className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
-                  {importSubmitting ? 'Importing…' : 'Import batch'}
+                <button type="submit" disabled={!canSubmitImport} className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
+                  {importSubmitting ? 'Importing...' : 'Import batch'}
                 </button>
               </div>
             </>

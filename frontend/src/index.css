@@ -16,12 +16,22 @@
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+    line-height: 1.5;
   }
   
   .font-mono, [data-mono] {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-variant-numeric: tabular-nums;
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.015em;
   }
 }
 
@@ -167,12 +177,12 @@
 }
 
 button[class~="bg-slate-900"] {
-  background-color: rgb(37 99 235);
+  background-color: rgb(47 91 78);
 }
 
 button[class~="bg-slate-900"]:hover,
 button[class~="hover:bg-slate-800"]:hover {
-  background-color: rgb(29 78 216);
+  background-color: rgb(37 76 64);
 }
 
 button:focus-visible,
@@ -180,7 +190,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid rgb(37 99 235);
+  outline: 2px solid rgb(176 145 91);
   outline-offset: 2px;
 }
 
@@ -194,17 +204,168 @@ a:focus-visible {
 }
 
 #main-content table tbody tr:nth-child(even) {
-  background-color: rgb(248 250 252 / 0.72);
+  background-color: rgb(247 248 246 / 0.86);
 }
 
 #main-content table tbody tr:hover {
-  background-color: rgb(241 245 249);
+  background-color: rgb(237 242 238);
 }
 
 #main-content table th {
-  text-align: left;
-  white-space: nowrap;
-  font-weight: 600;
+  color: rgb(52 63 58);
+  background: rgb(243 245 242);
+  letter-spacing: 0.05em;
+}
+
+/*
+ * Pension and public-administration palette:
+ * - Deep forest: institutional trust and primary actions
+ * - Warm brass: restrained emphasis and statutory context
+ * - Stone and charcoal: readable, low-fatigue enterprise surfaces
+ */
+.bg-blue-50 { background-color: rgb(243 246 244) !important; }
+.bg-blue-100 { background-color: rgb(226 234 230) !important; }
+.bg-blue-200 { background-color: rgb(201 213 205) !important; }
+.bg-blue-600 { background-color: rgb(47 91 78) !important; }
+.bg-blue-600\/20 { background-color: rgb(47 91 78 / 0.13) !important; }
+.bg-blue-700 { background-color: rgb(37 76 64) !important; }
+.bg-blue-800 { background-color: rgb(31 63 53) !important; }
+.bg-blue-900\/80 { background-color: rgb(38 49 45 / 0.92) !important; }
+
+.text-blue-300 { color: rgb(190 170 130) !important; }
+.text-blue-400 { color: rgb(176 145 91) !important; }
+.text-blue-600 { color: rgb(47 91 78) !important; }
+.text-blue-700 { color: rgb(37 76 64) !important; }
+.text-blue-800 { color: rgb(31 63 53) !important; }
+.text-blue-200 { color: rgb(222 210 186) !important; }
+.text-blue-900 { color: rgb(38 49 45) !important; }
+
+.border-blue-100 { border-color: rgb(226 234 230) !important; }
+.border-blue-200 { border-color: rgb(201 213 205) !important; }
+.border-blue-300 { border-color: rgb(176 145 91) !important; }
+.border-blue-400 { border-color: rgb(176 145 91) !important; }
+
+.hover\:bg-blue-50:hover { background-color: rgb(243 246 244) !important; }
+.hover\:bg-blue-700:hover { background-color: rgb(37 76 64) !important; }
+.hover\:bg-blue-800:hover { background-color: rgb(31 63 53) !important; }
+.hover\:border-blue-300:hover { border-color: rgb(176 145 91) !important; }
+.hover\:border-blue-400:hover { border-color: rgb(176 145 91) !important; }
+.hover\:text-blue-800:hover { color: rgb(31 63 53) !important; }
+
+.focus\:ring-blue-500:focus,
+.focus-visible\:ring-blue-500:focus-visible,
+.focus-visible\:outline-blue-600:focus-visible {
+  --tw-ring-color: rgb(47 91 78) !important;
+  outline-color: rgb(47 91 78) !important;
+}
+
+/* Low-chroma charcoal shell; avoids an overly colorful or recreational appearance. */
+.bg-slate-900 { background-color: rgb(38 49 45) !important; }
+.bg-slate-800 { background-color: rgb(53 63 59) !important; }
+.bg-slate-950\/60 { background-color: rgb(29 38 35 / 0.92) !important; }
+.bg-slate-100 { background-color: rgb(239 242 240) !important; }
+.bg-slate-50\/60 { background-color: rgb(247 248 246 / 0.92) !important; }
+
+/* Shared interface quality pass (ICD322 visual and accessibility principles). */
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  border-radius: 0.375rem;
+  background: rgb(15 23 42);
+  color: white;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: top 120ms ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+#main-content {
+  background: rgb(245 246 243);
+}
+
+#main-content button,
+#main-content [role="button"] {
+  min-height: 32px;
+}
+
+#main-content button:disabled {
+  cursor: not-allowed;
+}
+
+#main-content input,
+#main-content select,
+#main-content textarea {
+  min-height: 38px;
+}
+
+#main-content [type="checkbox"],
+#main-content [type="radio"] {
+  min-height: 0;
+}
+
+#main-content table thead {
+  position: relative;
+  z-index: 1;
+}
+
+#main-content table th {
+  color: rgb(52 63 58);
+  background: rgb(243 245 242);
+  letter-spacing: 0.05em;
+}
+
+#main-content table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+#main-content table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#main-content [role="alert"] {
+  box-shadow: none;
+}
+
+#main-content figure,
+#main-content [data-card],
+#main-content form,
+#main-content section[class*="rounded-xl"],
+#main-content div[class*="rounded-xl"] {
+  border-radius: 6px;
+}
+
+@media (hover: none) {
+  #main-content button,
+  #main-content [role="button"] {
+    min-height: 44px;
+  }
+
+  #main-content input,
+  #main-content select,
+  #main-content textarea {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @media print {

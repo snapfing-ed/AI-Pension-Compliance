@@ -81,7 +81,7 @@ export const AnalysisFindingsPage: React.FC = () => {
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div className="bg-slate-900 text-white rounded-xl p-6 shadow-sm">
         <span className="text-xs font-mono uppercase tracking-wider text-blue-400 font-semibold">
-          Modules 3B &amp; 3C · Deterministic Compliance Engine
+          Deterministic Compliance Engine
         </span>
         <h1 className="text-xl font-bold mt-1">Analysis Snapshots &amp; Compliance Findings</h1>
         <p className="text-xs text-slate-300 mt-1">

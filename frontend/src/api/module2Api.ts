@@ -172,7 +172,7 @@ async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
 export const module2Api = {
   listEmployers: (params: { q?: string; status?: string; page?: number; size?: number }) => {
     const qs = new URLSearchParams();
-    if (params.q) qs.set('q', params.q);
+    if (params.q) qs.set('search', params.q);
     if (params.status) qs.set('status', params.status);
     qs.set('page', String(params.page ?? 0));
     qs.set('size', String(params.size ?? 20));
@@ -185,7 +185,7 @@ export const module2Api = {
 
   listMembers: (params: { q?: string; page?: number; size?: number }) => {
     const qs = new URLSearchParams();
-    if (params.q) qs.set('q', params.q);
+    if (params.q) qs.set('search', params.q);
     qs.set('page', String(params.page ?? 0));
     qs.set('size', String(params.size ?? 20));
     return apiFetch<PageResponse<Member>>(`/api/members?${qs}`);
