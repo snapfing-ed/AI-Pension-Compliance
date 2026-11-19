@@ -52,7 +52,7 @@ import java.util.List;
 @Service
 public class AnalysisExecutionService {
 
-    private static final String LOGIC_VERSION = "PHASE3C-DETERMINISTIC-V2";
+    private static final String LOGIC_VERSION = "PHASE3C-DETERMINISTIC-V3";
 
     private final EmployerMonthAnalysisRepository analyses;
     private final AnalysisSnapshotRepository snapshots;
@@ -151,7 +151,10 @@ public class AnalysisExecutionService {
                         + "|CA=" + scopeAssessments.stream().map(CompletenessAssessment::getAssessmentId).toList()
         );
 
-        boolean incompleteData = activeBatches.isEmpty() || scopeAssessments.stream()
+        boolean reportedUnknown = latestReturns.stream()
+                .anyMatch(rv -> rv.getReportedTotalAmount() == null);
+
+        boolean incompleteData = activeBatches.isEmpty() || reportedUnknown || scopeAssessments.stream()
                 .anyMatch(a -> a.getAssessmentStatus() == AssessmentStatus.INCOMPLETE
                         || a.getAssessmentStatus() == AssessmentStatus.UNKNOWN);
 
@@ -166,7 +169,8 @@ public class AnalysisExecutionService {
         }
 
         BigDecimal totalReported = latestReturns.stream()
-                .map(rv -> rv.getReportedTotalAmount() != null ? rv.getReportedTotalAmount() : BigDecimal.ZERO)
+                .map(ReturnVersion::getReportedTotalAmount)
+                .filter(java.util.Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalPaid = activeAllocations.stream()
@@ -226,6 +230,12 @@ public class AnalysisExecutionService {
                     .setParameter(1, snapshot.getSnapshotId())
                     .setParameter(2, rv.getReturnVersionId())
                     .executeUpdate();
+            if (rv.getReportedTotalAmount() == null) {
+                dqFindings.save(new DataQualityFinding(
+                        snapshot.getSnapshotId(), "DQ_MISSING_REPORTED_TOTAL",
+                        "Return version #" + rv.getReturnVersionId() + " has NULL reported total amount.",
+                        "MEDIUM", "RETURN_VERSION", rv.getReturnVersionId(), null, null));
+            }
         }
         for (PaymentAllocation pa : activeAllocations) {
             em.createNativeQuery("INSERT INTO snapshot_payment_allocation (snapshot_id, allocation_id) VALUES (?, ?)")
@@ -241,7 +251,7 @@ public class AnalysisExecutionService {
         }
 
         emitDeterministicFindings(snapshot, req.employerId(), req.periodId(),
-                activeBatches, latestReturns, scopeAssessments, totalExpected, totalReported, totalPaid);
+                activeBatches, latestReturns, scopeAssessments, totalExpected, totalReported, totalPaid, reportedUnknown);
 
         audit.record(actor, "ANALYSIS_EXECUTED", "ANALYSIS_SNAPSHOT", snapshot.getSnapshotId().toString(),
                 "Executed analysisId=" + analysis.getAnalysisId() + " run=" + nextRun + " result=" + overall);
@@ -261,7 +271,8 @@ public class AnalysisExecutionService {
             List<CompletenessAssessment> scopeAssessments,
             BigDecimal totalExpected,
             BigDecimal totalReported,
-            BigDecimal totalPaid) {
+            BigDecimal totalPaid,
+            boolean reportedUnknown) {
 
         Long sid = snapshot.getSnapshotId();
 
@@ -293,7 +304,7 @@ public class AnalysisExecutionService {
             ));
         }
 
-        if (!activeBatches.isEmpty() && !latestReturns.isEmpty() && totalReported.compareTo(totalExpected) < 0) {
+        if (!activeBatches.isEmpty() && !latestReturns.isEmpty() && !reportedUnknown && totalReported.compareTo(totalExpected) < 0) {
             BigDecimal shortfall = totalExpected.subtract(totalReported);
             BigDecimal score = BigDecimal.valueOf(55.0).add(shortfall.divide(BigDecimal.valueOf(500), 3, RoundingMode.HALF_UP))
                     .min(new BigDecimal("100.000"));
@@ -302,6 +313,15 @@ public class AnalysisExecutionService {
                     "Reported contribution (" + totalReported + " ZMW) is below statutory expected (" + totalExpected + " ZMW) by " + shortfall + " ZMW.",
                     score, new BigDecimal("0.99000"), "RULE",
                     "Expected=" + totalExpected + " ZMW vs Reported=" + totalReported + " ZMW (variance=" + shortfall + " ZMW)."
+            ));
+        }
+
+        if (reportedUnknown) {
+            complianceFindings.save(new ComplianceFinding(
+                    sid, "RULE_RETURN_AMOUNT_MISSING", "POTENTIALLY_INCOMPLETE",
+                    "A submitted return version has no reported total amount, so reported contribution cannot be compared with expected.",
+                    new BigDecimal("70.000"), new BigDecimal("0.95000"), "RULE",
+                    "Reported total is NULL (not reported); it is treated as unknown, not zero."
             ));
         }
 
