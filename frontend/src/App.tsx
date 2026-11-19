@@ -13,6 +13,9 @@ import { MembersPage } from './pages/members/MembersPage';
 import { PeriodsSourcesPage } from './pages/periods/PeriodsSourcesPage';
 import { PayrollPage } from './pages/payroll/PayrollPage';
 import { RulesCalculatorPage } from './pages/contribution/RulesCalculatorPage';
+import { ReturnsPaymentsPage } from './pages/compliance/ReturnsPaymentsPage';
+import { AnalysisFindingsPage } from './pages/compliance/AnalysisFindingsPage';
+import { InvestigationCasesPage } from './pages/cases/InvestigationCasesPage';
 
 const AuthenticatedApp: React.FC = () => {
   const { activeTab } = useApp();
@@ -24,22 +27,31 @@ const AuthenticatedApp: React.FC = () => {
       case 'admin-overview':
       case 'overview':
         return <AdminDashboardPage />;
-      case 'users':        return <UserManagementPage />;
-      case 'employers':    return <EmployersPage isAdmin={isAdmin} />;
-      case 'members':      return <MembersPage isAdmin={isAdmin} />;
-      case 'periods':      return <PeriodsSourcesPage isAdmin={isAdmin} />;
-      case 'payroll':      return <PayrollPage isAdmin={isAdmin} />;
-      case 'rules':        return <RulesCalculatorPage />;
-      default:             return <AdminDashboardPage />;
+      case 'users':            return <UserManagementPage />;
+      case 'employers':        return <EmployersPage isAdmin={isAdmin} />;
+      case 'members':          return <MembersPage isAdmin={isAdmin} />;
+      case 'periods':          return <PeriodsSourcesPage isAdmin={isAdmin} />;
+      case 'payroll':          return <PayrollPage isAdmin={isAdmin} />;
+      case 'returns-payments': return <ReturnsPaymentsPage isAdmin={isAdmin} />;
+      case 'compliance':       return <AnalysisFindingsPage />;
+      case 'cases':            return <InvestigationCasesPage />;
+      case 'rules':            return <RulesCalculatorPage />;
+      default:                 return <AdminDashboardPage />;
     }
   };
 
   return (
     <div className="flex min-h-screen bg-slate-100 text-slate-900 font-sans">
+      <a
+        href="#main-content"
+        className="skip-link"
+      >
+        Skip to main content
+      </a>
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto" id="main-content">
+        <main className="flex-1 overflow-y-auto" id="main-content" tabIndex={-1}>
           {renderActiveView()}
         </main>
       </div>

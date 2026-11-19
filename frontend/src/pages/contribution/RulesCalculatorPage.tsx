@@ -152,19 +152,19 @@ export const RulesCalculatorPage: React.FC = () => {
             <div className="mt-4 pt-4 border-t border-slate-200 space-y-2.5 text-sm">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Rule: {preview.ruleCode || `v${preview.ruleVersionId}`}</span>
+                <span>Rule: {preview.ruleCode || `v${preview.ruleVersionNo}`}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
                 <span className="text-slate-500">Employee (5%)</span>
-                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employeeContribution)}</span>
+                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employeeAmount)}</span>
               </div>
               <div className="flex justify-between py-1.5 border-b border-slate-100">
                 <span className="text-slate-500">Employer (5%)</span>
-                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employerContribution)}</span>
+                <span className="font-mono font-semibold text-slate-900">{fmt(preview.employerAmount)}</span>
               </div>
               <div className="flex justify-between py-1.5">
                 <span className="font-semibold text-slate-900">Total Expected</span>
-                <span className="font-mono font-bold text-blue-700">{fmt(preview.totalContribution)}</span>
+                <span className="font-mono font-bold text-blue-700">{fmt(preview.totalAmount)}</span>
               </div>
             </div>
           )}
@@ -189,7 +189,7 @@ export const RulesCalculatorPage: React.FC = () => {
                   <th className="py-3 px-4 font-semibold">Rule Code</th>
                   <th className="py-3 px-4 font-semibold">Effective Window</th>
                   <th className="py-3 px-4 font-semibold">Rates (EE / ER)</th>
-                  <th className="py-3 px-4 font-semibold">Ceiling (Per Party)</th>
+                  <th className="py-3 px-4 font-semibold">Earnings ceiling (monthly)</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -218,7 +218,7 @@ export const RulesCalculatorPage: React.FC = () => {
                         {(r.employeeRate * 100).toFixed(2)}% / {(r.employerRate * 100).toFixed(2)}%
                       </td>
                       <td className="py-3.5 px-4 font-mono text-slate-900">
-                        {r.monthlyCeilingPerParty ? fmt(r.monthlyCeilingPerParty) : 'Uncapped'}
+                        {r.ceilingAmount != null ? fmt(r.ceilingAmount) : 'No ceiling'}
                       </td>
                     </tr>
                   ))

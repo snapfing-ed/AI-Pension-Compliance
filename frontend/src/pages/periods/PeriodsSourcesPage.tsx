@@ -31,6 +31,7 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
   const [sourceCode, setSourceCode] = useState('');
   const [sourceName, setSourceName] = useState('');
   const [sourceType, setSourceType] = useState('PAYROLL_EXPORT');
+  const [permittedPurpose, setPermittedPurpose] = useState('MONTHLY_COMPLIANCE_IMPORT');
   const [submittingSource, setSubmittingSource] = useState(false);
 
   const load = async () => {
@@ -81,7 +82,7 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
 
   const handleCreateSource = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!sourceCode.trim() || !sourceName.trim()) return;
+    if (!sourceCode.trim() || !sourceName.trim() || !permittedPurpose.trim()) return;
     try {
       setSubmittingSource(true);
       setError(null);
@@ -89,9 +90,11 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
         sourceCode: sourceCode.trim(),
         sourceName: sourceName.trim(),
         sourceType,
+        permittedPurpose: permittedPurpose.trim(),
       });
       setSourceCode('');
       setSourceName('');
+      setPermittedPurpose('MONTHLY_COMPLIANCE_IMPORT');
       setShowSourceForm(false);
       load();
     } catch (e: any) {
@@ -210,11 +213,14 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
             <h2 className="text-base font-semibold text-slate-900">Register Data Source</h2>
             <span className="text-xs text-slate-500">Tracks provenance of imported payroll batches</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Source Code</label>
               <input
                 required
+                maxLength={60}
+                pattern="[A-Za-z0-9][A-Za-z0-9_-]{0,59}"
+                title="Use 1–60 letters, numbers, underscores or hyphens; start with a letter or number."
                 className="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. SRC-PAYROLL-CSV"
                 value={sourceCode}
@@ -241,7 +247,19 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
                 <option value="PAYROLL_EXPORT">PAYROLL_EXPORT</option>
                 <option value="SYNTHETIC_GENERATOR">SYNTHETIC_GENERATOR</option>
                 <option value="MANUAL_ENTRY">MANUAL_ENTRY</option>
+                <option value="BANK">BANK</option>
+                <option value="RETURN_FILE">RETURN_FILE</option>
               </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Permitted Purpose</label>
+              <input
+                required
+                className="w-full border border-slate-300 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="e.g. MONTHLY_COMPLIANCE_IMPORT"
+                value={permittedPurpose}
+                onChange={(e) => setPermittedPurpose(e.target.value)}
+              />
             </div>
           </div>
           <div className="flex justify-end gap-2">
@@ -300,12 +318,12 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
                 </tr>
               ) : (
                 periods.map((p) => (
-                  <tr key={p.periodId} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={p.periodId} className="hover:bg-slate-50/85 transition-colors">
                     <td className="py-3.5 px-4 font-semibold text-slate-900">
                       {p.periodLabel || `${p.periodYear}-${String(p.periodMonth).padStart(2, '0')}`}
                     </td>
-                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.startDate}</td>
-                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.endDate}</td>
+                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.periodStart}</td>
+                    <td className="py-3.5 px-4 font-mono text-xs text-slate-600">{p.periodEnd}</td>
                     <td className="py-3.5 px-4">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold border ${
@@ -363,24 +381,25 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
                 <th className="py-3 px-4 font-semibold">Source Code</th>
                 <th className="py-3 px-4 font-semibold">Name</th>
                 <th className="py-3 px-4 font-semibold">Type</th>
+                <th className="py-3 px-4 font-semibold">Permitted Purpose</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={3} className="py-8 text-center text-slate-500">
+                  <td colSpan={4} className="py-8 text-center text-slate-500">
                     Loading data sources...
                   </td>
                 </tr>
               ) : sources.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-8 text-center text-slate-500">
+                  <td colSpan={4} className="py-8 text-center text-slate-500">
                     No data sources registered.
                   </td>
                 </tr>
               ) : (
                 sources.map((s) => (
-                  <tr key={s.sourceId} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={s.sourceId} className="hover:bg-slate-50/85 transition-colors">
                     <td className="py-3.5 px-4 font-mono font-semibold text-slate-900">{s.sourceCode}</td>
                     <td className="py-3.5 px-4 text-slate-700">{s.sourceName}</td>
                     <td className="py-3.5 px-4">
@@ -388,6 +407,7 @@ export const PeriodsSourcesPage: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) 
                         {s.sourceType}
                       </span>
                     </td>
+                    <td className="py-3.5 px-4 text-xs font-mono text-slate-600">{s.permittedPurpose}</td>
                   </tr>
                 ))
               )}

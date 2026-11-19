@@ -48,4 +48,6 @@ public interface PayrollBatchRepository
             @Param("employerId") Long employerId,
             @Param("periodId") Long periodId,
             Pageable pageable);
+
+    List<PayrollBatch> findByEmployerEmployerIdAndPeriodPeriodId(Long employerId, Long periodId);
 }
