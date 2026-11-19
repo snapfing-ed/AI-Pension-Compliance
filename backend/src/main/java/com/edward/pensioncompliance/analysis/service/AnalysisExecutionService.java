@@ -234,7 +234,7 @@ public class AnalysisExecutionService {
                 dqFindings.save(new DataQualityFinding(
                         snapshot.getSnapshotId(), "DQ_MISSING_REPORTED_TOTAL",
                         "Return version #" + rv.getReturnVersionId() + " has NULL reported total amount.",
-                        "MEDIUM", "RETURN_VERSION", rv.getReturnVersionId(), null, null));
+                        "MEDIUM", "RETURN_VERSION", null, null, null));
             }
         }
         for (PaymentAllocation pa : activeAllocations) {
