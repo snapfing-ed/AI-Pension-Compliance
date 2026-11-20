@@ -192,7 +192,7 @@ public class AnalysisExecutionService {
                 if (rec.getEligibleGrossPay() != null) {
                     totalGrossPay = totalGrossPay.add(rec.getEligibleGrossPay());
                 }
-                if ("ACTIVE".equalsIgnoreCase(rec.getPayrollStatus())) {
+                if (rec.getPayrollStatus() != null && "ACTIVE".equalsIgnoreCase(rec.getPayrollStatus().name())) {
                     activeMemberCount++;
                 }
                 CalculationResult res = calculator.calculate(rec.getEligibleGrossPay(), rule.parameters());
@@ -413,7 +413,7 @@ public class AnalysisExecutionService {
                     if (rec.getEligibleGrossPay() != null) {
                         pGross = pGross.add(rec.getEligibleGrossPay());
                     }
-                    if ("ACTIVE".equalsIgnoreCase(rec.getPayrollStatus())) {
+                    if (rec.getPayrollStatus() != null && "ACTIVE".equalsIgnoreCase(rec.getPayrollStatus().name())) {
                         pMembers++;
                     }
                 }
