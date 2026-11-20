@@ -20,8 +20,8 @@ import com.edward.pensioncompliance.findings.entity.DataQualityFinding;
 import com.edward.pensioncompliance.findings.repository.ComplianceFindingRepository;
 import com.edward.pensioncompliance.findings.repository.DataQualityFindingRepository;
 import com.edward.pensioncompliance.payments.entity.PaymentAllocation;
-import com.edward.pensioncompliance.payments.entity.PaymentTransaction;
 import com.edward.pensioncompliance.payments.entity.PaymentAllocationStatus;
+import com.edward.pensioncompliance.payments.entity.PaymentTransaction;
 import com.edward.pensioncompliance.payments.repository.PaymentAllocationRepository;
 import com.edward.pensioncompliance.payroll.entity.PayrollBatch;
 import com.edward.pensioncompliance.payroll.entity.PayrollRecord;
@@ -36,6 +36,7 @@ import com.edward.pensioncompliance.returns.repository.SubmittedReturnRepository
 import com.edward.pensioncompliance.user.entity.AppUser;
 import com.edward.pensioncompliance.user.repository.AppUserRepository;
 import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -50,13 +51,12 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.HexFormat;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class AnalysisExecutionService {
 
-    private static final String LOGIC_VERSION = "PHASE3C-DETERMINISTIC-V3";
+    private static final String LOGIC_VERSION = "PHASE3E-HYBRID-V1";
 
     private final EmployerMonthAnalysisRepository analyses;
     private final AnalysisSnapshotRepository snapshots;
@@ -76,6 +76,7 @@ public class AnalysisExecutionService {
     private final AppUserRepository users;
     private final AuditService audit;
     private final EntityManager em;
+    private final MlAnomalyClient mlClient;
     private final ContributionCalculator calculator = new ContributionCalculator();
     private final DeterministicRuleEvaluator ruleEvaluator = new DeterministicRuleEvaluator();
     private final DueDateCalculator dueDateCalculator = new DueDateCalculator();
@@ -90,6 +91,23 @@ public class AnalysisExecutionService {
             CompletenessAssessmentRepository assessments, ContributionRuleService ruleService,
             ContributionRuleVersionRepository ruleRepo, AppUserRepository users,
             AuditService audit, EntityManager em) {
+        this(analyses, snapshots, calculations, complianceFindings, dqFindings, employers, periods,
+                batches, payrollRecords, returns, returnVersions, allocations, assessments,
+                ruleService, ruleRepo, users, audit, em,
+                new MlAnomalyClient(false, "http://localhost:8090", 1000));
+    }
+
+    @Autowired
+    public AnalysisExecutionService(
+            EmployerMonthAnalysisRepository analyses, AnalysisSnapshotRepository snapshots,
+            ContributionCalculationRepository calculations, ComplianceFindingRepository complianceFindings,
+            DataQualityFindingRepository dqFindings, EmployerRepository employers,
+            ContributionPeriodRepository periods, PayrollBatchRepository batches,
+            PayrollRecordRepository payrollRecords, SubmittedReturnRepository returns,
+            ReturnVersionRepository returnVersions, PaymentAllocationRepository allocations,
+            CompletenessAssessmentRepository assessments, ContributionRuleService ruleService,
+            ContributionRuleVersionRepository ruleRepo, AppUserRepository users,
+            AuditService audit, EntityManager em, MlAnomalyClient mlClient) {
         this.analyses = analyses;
         this.snapshots = snapshots;
         this.calculations = calculations;
@@ -108,6 +126,7 @@ public class AnalysisExecutionService {
         this.users = users;
         this.audit = audit;
         this.em = em;
+        this.mlClient = mlClient;
     }
 
     @PreAuthorize("hasAnyRole('SYSTEM_ADMINISTRATOR', 'COMPLIANCE_SUPERVISOR')")
@@ -165,8 +184,17 @@ public class AnalysisExecutionService {
                         || a.getAssessmentStatus() == AssessmentStatus.UNKNOWN);
 
         BigDecimal totalExpected = BigDecimal.ZERO;
+        BigDecimal totalGrossPay = BigDecimal.ZERO;
+        int activeMemberCount = 0;
+
         for (PayrollBatch b : activeBatches) {
             for (PayrollRecord rec : payrollRecords.findByPayrollBatchPayrollBatchId(b.getPayrollBatchId())) {
+                if (rec.getEligibleGrossPay() != null) {
+                    totalGrossPay = totalGrossPay.add(rec.getEligibleGrossPay());
+                }
+                if ("ACTIVE".equalsIgnoreCase(rec.getPayrollStatus())) {
+                    activeMemberCount++;
+                }
                 CalculationResult res = calculator.calculate(rec.getEligibleGrossPay(), rule.parameters());
                 if (res.status() == CalculationStatus.CALCULATED) {
                     totalExpected = totalExpected.add(res.totalAmount());
@@ -176,7 +204,7 @@ public class AnalysisExecutionService {
 
         BigDecimal totalReported = latestReturns.stream()
                 .map(ReturnVersion::getReportedTotalAmount)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalPaid = activeAllocations.stream()
@@ -261,7 +289,7 @@ public class AnalysisExecutionService {
 
         int maxReturnDaysLate = latestReturns.stream()
                 .map(ReturnVersion::getSubmittedAt)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .map(ts -> ts.atZoneSameInstant(DueDateCalculator.ZAMBIA_ZONE).toLocalDate())
                 .filter(d -> d.isAfter(dueDate))
                 .mapToInt(d -> (int) ChronoUnit.DAYS.between(dueDate, d))
@@ -270,9 +298,9 @@ public class AnalysisExecutionService {
 
         int maxPaymentDaysLate = activeAllocations.stream()
                 .map(pa -> em.find(PaymentTransaction.class, pa.getPaymentId()))
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .map(PaymentTransaction::getPaidAt)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .map(ts -> ts.atZoneSameInstant(DueDateCalculator.ZAMBIA_ZONE).toLocalDate())
                 .filter(d -> d.isAfter(dueDate))
                 .mapToInt(d -> (int) ChronoUnit.DAYS.between(dueDate, d))
@@ -282,13 +310,63 @@ public class AnalysisExecutionService {
         boolean scopeEvidenceIncomplete = scopeAssessments.stream().anyMatch(a ->
                 a.getAssessmentStatus() == AssessmentStatus.INCOMPLETE
                         || a.getAssessmentStatus() == AssessmentStatus.UNKNOWN);
-        emitDeterministicFindings(snapshot, new RuleInputs(
+
+        RuleInputs ruleInputs = new RuleInputs(
                 req.employerId(), req.periodId(), activeBatches.size(), latestReturns.size(),
                 reportedUnknown, scopeEvidenceIncomplete, totalExpected, totalReported, totalPaid,
-                maxReturnDaysLate, maxPaymentDaysLate));
+                maxReturnDaysLate, maxPaymentDaysLate);
+
+        List<FindingDraft> ruleDrafts = ruleEvaluator.evaluate(ruleInputs);
+        for (FindingDraft d : ruleDrafts) {
+            complianceFindings.save(new ComplianceFinding(
+                    snapshot.getSnapshotId(), d.findingCode(), d.category(), d.description(),
+                    d.priorityScore(), d.confidenceScore(), d.detectionMethod(), d.explanation()));
+        }
+
+        // Phase 3E: Advisory ML anomaly scoring (fail-open if service unavailable)
+        int quarantinedCount = countQuarantinedRows(activeBatches);
+        MlAnomalyClient.ObservationPayload targetObs = new MlAnomalyClient.ObservationPayload(
+                req.employerId(),
+                req.periodId(),
+                formatPeriodYm(period),
+                activeBatches.size(),
+                latestReturns.size(),
+                activeMemberCount,
+                quarantinedCount,
+                totalGrossPay.doubleValue(),
+                totalExpected.doubleValue(),
+                totalReported.doubleValue(),
+                totalPaid.doubleValue(),
+                reportedUnknown,
+                scopeEvidenceIncomplete,
+                maxReturnDaysLate,
+                maxPaymentDaysLate
+        );
+
+        List<MlAnomalyClient.ObservationPayload> historyObs = buildEmployerHistory(req.employerId(), req.periodId());
+        mlClient.predict(new MlAnomalyClient.PredictPayload(targetObs, historyObs)).ifPresent(pred -> {
+            snapshot.setModelInfo(pred.modelName(), pred.modelVersion());
+            if (pred.isAnomaly()) {
+                String method = ruleDrafts.isEmpty() ? "ML" : "HYBRID";
+                complianceFindings.save(new ComplianceFinding(
+                        snapshot.getSnapshotId(),
+                        pred.findingCode(),
+                        pred.category(),
+                        "Unusual employer-period contribution pattern flagged by Isolation Forest anomaly detector.",
+                        pred.priorityScore(),
+                        pred.confidenceScore(),
+                        method,
+                        pred.explanation()
+                ));
+                if (snapshot.getOverallResult() == SnapshotResult.NO_ISSUE_DETECTED) {
+                    snapshot.updateOverallResult(SnapshotResult.REQUIRES_REVIEW);
+                }
+            }
+            snapshots.save(snapshot);
+        });
 
         audit.record(actor, "ANALYSIS_EXECUTED", "ANALYSIS_SNAPSHOT", snapshot.getSnapshotId().toString(),
-                "Executed analysisId=" + analysis.getAnalysisId() + " run=" + nextRun + " result=" + overall);
+                "Executed analysisId=" + analysis.getAnalysisId() + " run=" + nextRun + " result=" + snapshot.getOverallResult());
 
         return SnapshotDetailResponse.of(
                 snapshot, totalExpected, totalReported, totalPaid,
@@ -296,12 +374,86 @@ public class AnalysisExecutionService {
         );
     }
 
-    private void emitDeterministicFindings(AnalysisSnapshot snapshot, RuleInputs inputs) {
-        for (FindingDraft d : ruleEvaluator.evaluate(inputs)) {
-            complianceFindings.save(new ComplianceFinding(
-                    snapshot.getSnapshotId(), d.findingCode(), d.category(), d.description(),
-                    d.priorityScore(), d.confidenceScore(), d.detectionMethod(), d.explanation()));
+    private int countQuarantinedRows(List<PayrollBatch> activeBatches) {
+        if (activeBatches.isEmpty()) {
+            return 0;
         }
+        List<Long> batchIds = activeBatches.stream().map(PayrollBatch::getPayrollBatchId).toList();
+        Object result = em.createQuery(
+                        "SELECT COUNT(q) FROM PayrollQuarantineRecord q WHERE q.payrollBatch.payrollBatchId IN :ids")
+                .setParameter("ids", batchIds)
+                .getSingleResult();
+        return ((Number) result).intValue();
+    }
+
+    private List<MlAnomalyClient.ObservationPayload> buildEmployerHistory(Long employerId, Long currentPeriodId) {
+        List<EmployerMonthAnalysis> priorAnalyses = em.createQuery(
+                        "SELECT a FROM EmployerMonthAnalysis a WHERE a.employerId = :empId AND a.periodId <> :currPeriod",
+                        EmployerMonthAnalysis.class)
+                .setParameter("empId", employerId)
+                .setParameter("currPeriod", currentPeriodId)
+                .getResultList();
+
+        List<MlAnomalyClient.ObservationPayload> history = new ArrayList<>();
+        for (EmployerMonthAnalysis prior : priorAnalyses) {
+            ContributionPeriod p = periods.findById(prior.getPeriodId()).orElse(null);
+            if (p == null) {
+                continue;
+            }
+            List<PayrollBatch> pBatches = batches.findByEmployerEmployerIdAndPeriodPeriodId(employerId, p.getPeriodId()).stream()
+                    .filter(b -> "VALIDATED".equals(b.getStatus().name()))
+                    .toList();
+            if (pBatches.isEmpty()) {
+                continue;
+            }
+            BigDecimal pGross = BigDecimal.ZERO;
+            int pMembers = 0;
+            for (PayrollBatch b : pBatches) {
+                for (PayrollRecord rec : payrollRecords.findByPayrollBatchPayrollBatchId(b.getPayrollBatchId())) {
+                    if (rec.getEligibleGrossPay() != null) {
+                        pGross = pGross.add(rec.getEligibleGrossPay());
+                    }
+                    if ("ACTIVE".equalsIgnoreCase(rec.getPayrollStatus())) {
+                        pMembers++;
+                    }
+                }
+            }
+            List<ReturnVersion> pReturns = returns.findByEmployerIdAndPeriodId(employerId, p.getPeriodId()).stream()
+                    .flatMap(sr -> returnVersions.findTopByReturnIdOrderByVersionNoDesc(sr.getReturnId()).stream())
+                    .toList();
+            BigDecimal pReported = pReturns.stream()
+                    .map(ReturnVersion::getReportedTotalAmount)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal pPaid = allocations.findByAnalysisIdAndAllocationStatusOrderByAllocatedAtDesc(
+                            prior.getAnalysisId(), PaymentAllocationStatus.ACTIVE).stream()
+                    .map(PaymentAllocation::getAllocatedAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            history.add(new MlAnomalyClient.ObservationPayload(
+                    employerId,
+                    p.getPeriodId(),
+                    formatPeriodYm(p),
+                    pBatches.size(),
+                    pReturns.size(),
+                    pMembers,
+                    countQuarantinedRows(pBatches),
+                    pGross.doubleValue(),
+                    pGross.multiply(new BigDecimal("0.10")).doubleValue(),
+                    pReported.doubleValue(),
+                    pPaid.doubleValue(),
+                    pReturns.stream().anyMatch(rv -> rv.getReportedTotalAmount() == null),
+                    false,
+                    0,
+                    0
+            ));
+        }
+        history.sort(Comparator.comparing(MlAnomalyClient.ObservationPayload::period_ym));
+        return history;
+    }
+
+    private static String formatPeriodYm(ContributionPeriod p) {
+        return String.format("%04d-%02d", p.getPeriodYear(), p.getPeriodMonth());
     }
 
     @Transactional(readOnly = true)

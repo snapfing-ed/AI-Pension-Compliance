@@ -6,3 +6,7 @@ jupyterlab
 joblib
 psycopg[binary]
 pytest
+fastapi==0.125.0
+uvicorn==0.54.0
+pydantic==2.12.5
+httpx==0.28.1

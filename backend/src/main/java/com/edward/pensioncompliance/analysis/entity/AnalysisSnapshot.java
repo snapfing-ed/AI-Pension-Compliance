@@ -64,12 +64,23 @@ public class AnalysisSnapshot {
         this.createdByUserId = createdByUserId;
     }
 
+    public void setModelInfo(String modelName, String modelVersion) {
+        this.modelName = modelName;
+        this.modelVersion = modelVersion;
+    }
+
+    public void updateOverallResult(SnapshotResult overallResult) {
+        this.overallResult = overallResult;
+    }
+
     public Long getSnapshotId() { return snapshotId; }
     public Long getAnalysisId() { return analysisId; }
     public Integer getRunNumber() { return runNumber; }
     public OffsetDateTime getRunStartedAt() { return runStartedAt; }
     public OffsetDateTime getRunCompletedAt() { return runCompletedAt; }
     public Long getRuleVersionId() { return ruleVersionId; }
+    public String getModelName() { return modelName; }
+    public String getModelVersion() { return modelVersion; }
     public String getDetectionLogicVersion() { return detectionLogicVersion; }
     public String getInputFingerprint() { return inputFingerprint; }
     public SnapshotResult getOverallResult() { return overallResult; }
