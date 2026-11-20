@@ -1,0 +1,86 @@
+[
+  {
+    "name": "fully_reconciled",
+    "inputs": {
+      "employerId": 10, "periodId": 1, "activeBatchCount": 1, "latestReturnCount": 1,
+      "reportedUnknown": false, "scopeEvidenceIncomplete": false,
+      "totalExpected": "2000.00", "totalReported": "2000.00", "totalPaid": "2000.00",
+      "maxReturnDaysLate": 0, "maxPaymentDaysLate": 0
+    },
+    "expected": []
+  },
+  {
+    "name": "missing_payroll_batch",
+    "inputs": {
+      "employerId": 10, "periodId": 2, "activeBatchCount": 0, "latestReturnCount": 0,
+      "reportedUnknown": false, "scopeEvidenceIncomplete": false,
+      "totalExpected": "0.00", "totalReported": "0.00", "totalPaid": "0.00",
+      "maxReturnDaysLate": 0, "maxPaymentDaysLate": 0
+    },
+    "expected": [
+      {"findingCode": "RULE_MISSING_PAYROLL_BATCH", "category": "POTENTIALLY_MISSING", "priorityScore": "85.000"}
+    ]
+  },
+  {
+    "name": "missing_contribution_return",
+    "inputs": {
+      "employerId": 10, "periodId": 3, "activeBatchCount": 1, "latestReturnCount": 0,
+      "reportedUnknown": false, "scopeEvidenceIncomplete": false,
+      "totalExpected": "1500.00", "totalReported": "0.00", "totalPaid": "1500.00",
+      "maxReturnDaysLate": 0, "maxPaymentDaysLate": 0
+    },
+    "expected": [
+      {"findingCode": "RULE_MISSING_CONTRIBUTION_RETURN", "category": "POTENTIALLY_MISSING", "priorityScore": "90.000"}
+    ]
+  },
+  {
+    "name": "under_reported_and_unremitted",
+    "inputs": {
+      "employerId": 10, "periodId": 4, "activeBatchCount": 1, "latestReturnCount": 1,
+      "reportedUnknown": false, "scopeEvidenceIncomplete": false,
+      "totalExpected": "2000.00", "totalReported": "1500.00", "totalPaid": "1250.00",
+      "maxReturnDaysLate": 0, "maxPaymentDaysLate": 0
+    },
+    "expected": [
+      {"findingCode": "RULE_UNDER_REPORTED_CONTRIBUTION", "category": "POTENTIALLY_INCOMPLETE", "priorityScore": "56.000"},
+      {"findingCode": "RULE_UNREMITTED_CONTRIBUTION_SHORTFALL", "category": "POTENTIALLY_DELAYED", "priorityScore": "61.500"}
+    ]
+  },
+  {
+    "name": "null_reported_total_not_treated_as_zero",
+    "inputs": {
+      "employerId": 10, "periodId": 5, "activeBatchCount": 1, "latestReturnCount": 1,
+      "reportedUnknown": true, "scopeEvidenceIncomplete": false,
+      "totalExpected": "2000.00", "totalReported": "0.00", "totalPaid": "2000.00",
+      "maxReturnDaysLate": 0, "maxPaymentDaysLate": 0
+    },
+    "expected": [
+      {"findingCode": "RULE_RETURN_AMOUNT_MISSING", "category": "POTENTIALLY_INCOMPLETE", "priorityScore": "70.000"}
+    ]
+  },
+  {
+    "name": "late_return_and_late_payment",
+    "inputs": {
+      "employerId": 10, "periodId": 6, "activeBatchCount": 1, "latestReturnCount": 1,
+      "reportedUnknown": false, "scopeEvidenceIncomplete": false,
+      "totalExpected": "2000.00", "totalReported": "2000.00", "totalPaid": "2000.00",
+      "maxReturnDaysLate": 4, "maxPaymentDaysLate": 10
+    },
+    "expected": [
+      {"findingCode": "RULE_LATE_RETURN_SUBMISSION", "category": "POTENTIALLY_DELAYED", "priorityScore": "61.000"},
+      {"findingCode": "RULE_LATE_PAYMENT", "category": "POTENTIALLY_DELAYED", "priorityScore": "70.000"}
+    ]
+  },
+  {
+    "name": "positive_contribution_variance",
+    "inputs": {
+      "employerId": 10, "periodId": 7, "activeBatchCount": 1, "latestReturnCount": 1,
+      "reportedUnknown": false, "scopeEvidenceIncomplete": false,
+      "totalExpected": "2000.00", "totalReported": "2400.00", "totalPaid": "2400.00",
+      "maxReturnDaysLate": 0, "maxPaymentDaysLate": 0
+    },
+    "expected": [
+      {"findingCode": "RULE_POSITIVE_CONTRIBUTION_VARIANCE", "category": "UNUSUAL_PATTERN", "priorityScore": "50.000"}
+    ]
+  }
+]
