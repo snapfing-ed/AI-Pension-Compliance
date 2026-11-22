@@ -3,3 +3,5 @@ data/
 models/*.joblib
 __pycache__/
 .ipynb_checkpoints/
+.pytest_cache/
+.pytest_cache/
